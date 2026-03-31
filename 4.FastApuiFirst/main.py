@@ -1,11 +1,22 @@
 from fastapi import FastAPI,Query
 from pydantic import BaseModel, Field
+from fastapi.responses import HTMLResponse, FileResponse
 
 app = FastAPI()
 
 
 
+# 11.响应体类型，HTML格式
+@app.get("/file")
+async def get_file():
+    path = "./test.txt"
+    return FileResponse(path)
 
+
+# 11.响应体类型，HTML格式
+@app.get("/html", response_class=HTMLResponse)
+async def get_html():
+    return "<h1>这是一个安静的晚上， 我坐在摇椅里乘凉</h1>"
 
 
 
