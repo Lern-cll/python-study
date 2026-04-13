@@ -4,6 +4,23 @@ from fastapi.responses import HTMLResponse, FileResponse
 
 app = FastAPI()
 
+# 13.自定义响应数据格式
+
+# 新闻接口，响应格式，id + title + content
+class News(BaseModel):
+    id: int
+    title: str
+    content: str
+
+@app.get("/news/{id}", response_model=News)
+async def get_news(id: int):
+    return {
+        "id": id,
+        "title": f"这是第{id}本书",
+        "content": f"这是一本绝世好书"
+    }
+
+
 
 
 # 11.响应体类型，HTML格式
