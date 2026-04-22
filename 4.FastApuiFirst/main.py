@@ -1,89 +1,25 @@
-from fastapi import FastAPI,Query
-from pydantic import BaseModel, Field
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi import FastAPI
+from testPy.routers import router
 
 app = FastAPI()
 
-# 需求:按 id 查询新闻→1-6
+app.include_router(router)
 
+@app.middleware("http")
+async def add_middleware2(request, call_next):
+    print("中间件2触发了")
+    response = await call_next(request)
+    print("中间件2执行完毕了")
+    return response
 
-#13 需求:新闻接口 →响应数据格式 id、title、content
-class News (BaseModel):
-    id: int
-    title: str
-    content: str
+@app.middleware("http")
+async def add_middleware(request, call_next):
+    print("中间件1触发了")
+    response = await call_next(request)
+    print("中间件1执行完毕了")
+    return response
 
-@app.get("/news/{id}", response_model=News)
-async def get_news(id: int):
-    return {
-        "id": id,
-        "title": f"这是第{id}本书",
-        "content": "这是一本好书",
-    }
-
-
-# 12.响应体类型，HTML格式
-@app.get("/file")
-async def get_file():
-    path = "./test.txt"
-    return FileResponse(path)
-
-
-# 11.响应体类型，HTML格式
-@app.get("/html", response_class=HTMLResponse)
-async def get_html():
-    return "<h1>这是一个安静的晚上， 我坐在摇椅里乘凉</h1>"
-
-
-
-# 08,注册： 用户名和密码
-class User(BaseModel):
-    username: str
-    password: str
-
-@app.post('/register')
-def register(user: User):
-    return user
-
-
-# 新增图书： 图书信息包含:书名、作者、出版社、售价
-class BookItem(BaseModel):
-    title: str = Field(..., le = 20, ge = 2)
-    author: str = Field(ge = 2, le = 10)
-    publisher: str = Field(default = "这是一个安静的晚上", le = 2)
-    price: float = Field(..., gt = 0.01, le = 100000)
-
-@app.post('/add_book')
-def add_book(item: BookItem):
-    return item
-
-
-# 07: 书籍的类别和价格，并且限制价格范围
-# Query() 是引入的校验函数， ... 表示必填
-@app.get("/book/item")
-async def query_book_item(type: int = Query("Python开发", description = "书籍的类别", ge = 5, le = 255 ), price: int = Query(0, description="返回的记录数", ge = 50, le = 100)):
-    return { "type": type, "price": price }
-
-# 获取新闻列表消息，主要是拼接
-@app.get("/news/news_list")
-async def query_news_list(skip: int = Query(0, description = "跳过的记录数", lt = 100), limit: int = Query(10, description="返回的记录数")):
-    return { "skip": skip, "limit": limit }
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
-
-@app.get("/hello/user")
-async def say_hello():
-    return {"message": f"我正在学习FastApi..."}
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
-
-
-
-
-
-
