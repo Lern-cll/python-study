@@ -1,0 +1,35 @@
+# Python 缓存
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# 编辑器
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# 项目日志、临时文件
+logs/
+*.log
+temp/
+tmp/
+*.tmp
+
+# FastAPI / Uvicorn 运行文件
+*.pid
+*.pid.lock
+*.db
+*.sqlite3
+
+# 系统文件（Windows/mac）
+.DS_Store
+Thumbs.db

@@ -1,6 +1,5 @@
-from fastapi import FastAPI,Query
-from pydantic import BaseModel, Field
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi import FastAPI
+from testPy.routers import router
 
 app = FastAPI()
 
@@ -53,38 +52,23 @@ class BookItem(BaseModel):
     author: str = Field(ge = 2, le = 10)
     publisher: str = Field(default = "这是一个安静的晚上", le = 2)
     price: float = Field(..., gt = 0.01, le = 100000)
+app.include_router(router)
 
-@app.post('/add_book')
-def add_book(item: BookItem):
-    return item
+@app.middleware("http")
+async def add_middleware2(request, call_next):
+    print("中间件2触发了")
+    response = await call_next(request)
+    print("中间件2执行完毕了")
+    return response
 
+@app.middleware("http")
+async def add_middleware(request, call_next):
+    print("中间件1触发了")
+    response = await call_next(request)
+    print("中间件1执行完毕了")
+    return response
 
-# 07: 书籍的类别和价格，并且限制价格范围
-# Query() 是引入的校验函数， ... 表示必填
-@app.get("/book/item")
-async def query_book_item(type: int = Query("Python开发", description = "书籍的类别", ge = 5, le = 255 ), price: int = Query(0, description="返回的记录数", ge = 50, le = 100)):
-    return { "type": type, "price": price }
-
-# 获取新闻列表消息，主要是拼接
-@app.get("/news/news_list")
-async def query_news_list(skip: int = Query(0, description = "跳过的记录数", lt = 100), limit: int = Query(10, description="返回的记录数")):
-    return { "skip": skip, "limit": limit }
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
-
-@app.get("/hello/user")
-async def say_hello():
-    return {"message": f"我正在学习FastApi..."}
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
-
-
-
-
-
-
