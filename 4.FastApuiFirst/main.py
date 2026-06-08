@@ -17,11 +17,11 @@ from dataBase.database import create_tables, async_engine
 async def lifespan(app: FastAPI):
     # 启动时执行
     await create_tables()
-    print("✅ 数据库表已就绪")
+    print("[OK] 数据库表已就绪")
     yield
     # 关闭时执行
     await async_engine.dispose()
-    print("🛑 数据库连接池已释放")
+    print("[STOP] 数据库连接池已释放")
 
 
 app = FastAPI(lifespan=lifespan)
