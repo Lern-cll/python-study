@@ -39,7 +39,6 @@ class Book(Base):
     name: Mapped[str] = mapped_column(String(255), index=True, comment="书名")
     author: Mapped[str] = mapped_column(String(255), index=True, comment="作者")
     price: Mapped[int] = mapped_column(Integer, index=True, comment="价格")
-    book_type: Mapped[str] = mapped_column(String(255), index=True, comment="类别")
 
 
 # 3.创建数据库表 -> FastAPI 启动的时候调用建表
@@ -51,12 +50,13 @@ async def create_tables():
 
 
 #需求: 查询功能的接口，查询图书 -> 依赖注入:创建依赖项获取数据库会话 + Depends 注入路由处理函数
+# ========== 数据库会话管理 ============
 AsyncSessionLocal = async_sessionmaker(
     bind=async_engine, # 绑定异步引擎
     expire_on_commit=False, # 关闭会话时，不自动提交事务
     class_=AsyncSession, # 使用异步会话类
 )
-
+# ========== 数据库会话依赖项 ============
 async def get_db_session():
     async with AsyncSessionLocal() as session:
         try:
