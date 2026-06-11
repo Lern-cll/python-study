@@ -31,6 +31,8 @@ __all__ = [
     "get_current_user",
     # 数据模型
     "BookItem",
+    "BookAdd",
+    "BookUpdate",
     "News",
     "User",
 ]

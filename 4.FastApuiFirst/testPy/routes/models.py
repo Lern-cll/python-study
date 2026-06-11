@@ -14,7 +14,20 @@ class User(BaseModel):
 
 
 class BookItem(BaseModel):
-    title: str = Field(..., le=20, ge=2)
-    author: str = Field(ge=2, le=10)
-    publisher: str = Field(default="这是一个安静的晚上", le=2)
+    name: str = Field(..., max_length=20, min_length=2)
+    author: str = Field(min_length=2, max_length=10)
+    publisher: str = Field(default="这是一个安静的晚上", max_length=2)
     price: float = Field(..., gt=0.01, le=100000)
+
+class BookAdd(BaseModel):
+    id: int
+    name: str
+    author: str
+    price: int
+    type: int
+
+class BookUpdate(BaseModel):
+    name: str
+    author: str
+    price: int
+    type: int
