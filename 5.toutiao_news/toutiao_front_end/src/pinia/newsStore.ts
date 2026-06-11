@@ -2,14 +2,18 @@
  * 新闻状态管理
  */
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import { getCategories as getCategoriesApi, getNewsList as getNewsListApi, getNewsDetail as getNewsDetailApi } from '@/api/news'
+import { ref, computed } from 'vue'
+import {
+  getCategories as getCategoriesApi,
+  getNewsList as getNewsListApi,
+  getNewsDetail as getNewsDetailApi
+} from '@/api/news'
 
 export const useNewsStore = defineStore('news', () => {
   // 状态
-  const categories = ref([])
-  const newsList = ref([])
-  const currentNews = ref(null)
+  const categories = ref<CategoryItem[]>([])
+  const newsList = ref<NewsItem[]>([])
+  const currentNews = ref<NewsItem | null>(null)
   const loading = ref(false)
   const currentPage = ref(1)
   const pageSize = ref(10)
@@ -26,7 +30,7 @@ export const useNewsStore = defineStore('news', () => {
   }
 
   // 获取新闻列表
-  const fetchNewsList = async (params = {}) => {
+  const fetchNewsList = async (params: { categoryId?: number | null; page?: number } = {}) => {
     loading.value = true
     try {
       const res = await getNewsListApi({
@@ -49,7 +53,7 @@ export const useNewsStore = defineStore('news', () => {
   }
 
   // 获取新闻详情
-  const fetchNewsDetail = async (id) => {
+  const fetchNewsDetail = async (id: number) => {
     loading.value = true
     try {
       const res = await getNewsDetailApi(id)
@@ -62,7 +66,7 @@ export const useNewsStore = defineStore('news', () => {
   }
 
   // 分页加载更多
-  const loadMore = async (params = {}) => {
+  const loadMore = async (params: { categoryId?: number | null } = {}) => {
     currentPage.value++
     await fetchNewsList(params)
   }

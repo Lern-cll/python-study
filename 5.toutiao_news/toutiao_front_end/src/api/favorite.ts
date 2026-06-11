@@ -3,12 +3,16 @@
  */
 import request from '@/utils/request'
 
+// 请求参数类型
+interface FavoriteListParams {
+  page?: number
+  pageSize?: number
+}
+
 /**
  * 获取收藏列表
- * @param {object} params - 查询参数 { page, pageSize }
- * @returns {promise} 返回收藏列表
  */
-export function getFavoriteList(params) {
+export function getFavoriteList(params: FavoriteListParams): Promise<ApiResponse> {
   return request({
     url: '/favorite/list',
     method: 'get',
@@ -18,10 +22,8 @@ export function getFavoriteList(params) {
 
 /**
  * 添加收藏
- * @param {number} newsId - 新闻ID
- * @returns {promise} 返回收藏结果
  */
-export function addFavorite(newsId) {
+export function addFavorite(newsId: number): Promise<ApiResponse> {
   return request({
     url: '/favorite/add',
     method: 'post',
@@ -31,10 +33,8 @@ export function addFavorite(newsId) {
 
 /**
  * 取消收藏
- * @param {number} favoriteId - 收藏ID
- * @returns {promise} 返回取消结果
  */
-export function removeFavorite(favoriteId) {
+export function removeFavorite(favoriteId: number): Promise<ApiResponse> {
   return request({
     url: '/favorite/remove',
     method: 'delete',
@@ -44,9 +44,8 @@ export function removeFavorite(favoriteId) {
 
 /**
  * 清空所有收藏
- * @returns {promise} 返回清空结果
  */
-export function clearFavorites() {
+export function clearFavorites(): Promise<ApiResponse> {
   return request({
     url: '/favorite/clear',
     method: 'delete'
@@ -55,10 +54,8 @@ export function clearFavorites() {
 
 /**
  * 检查收藏状态
- * @param {number} newsId - 新闻ID
- * @returns {promise} 返回是否已收藏
  */
-export function checkFavorite(newsId) {
+export function checkFavorite(newsId: number): Promise<ApiResponse<{ isFavorited: boolean }>> {
   return request({
     url: '/favorite/check',
     method: 'get',

@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import MainLayout from '@/layouts/MainLayout.vue'
 import Home from '@/pages/Home.vue'
 import AiChat from '@/pages/AiChat.vue'
@@ -12,7 +12,7 @@ import HistoryList from '@/pages/HistoryList.vue'
 import { getToken, isTokenExpired } from '@/utils/auth'
 import { ElMessage } from 'element-plus'
 
-const routes = [
+const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'Login',

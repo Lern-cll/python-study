@@ -8,18 +8,17 @@ const TOKEN_EXPIRES_KEY = 'toutiao_token_expires'
 
 /**
  * 获取 Token
- * @returns {string|null} Token值
  */
-export function getToken() {
+export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY)
 }
 
 /**
  * 设置 Token
- * @param {string} token - Token值
- * @param {number} expiresIn - 有效期（秒），默认7天
+ * @param token - Token值
+ * @param expiresIn - 有效期（秒），默认7天
  */
-export function setToken(token, expiresIn = 7 * 24 * 60 * 60) {
+export function setToken(token: string, expiresIn: number = 7 * 24 * 60 * 60): void {
   localStorage.setItem(TOKEN_KEY, token)
   const expiresTime = Date.now() + expiresIn * 1000
   localStorage.setItem(TOKEN_EXPIRES_KEY, expiresTime.toString())
@@ -28,16 +27,15 @@ export function setToken(token, expiresIn = 7 * 24 * 60 * 60) {
 /**
  * 移除 Token
  */
-export function removeToken() {
+export function removeToken(): void {
   localStorage.removeItem(TOKEN_KEY)
   localStorage.removeItem(TOKEN_EXPIRES_KEY)
 }
 
 /**
  * 检查 Token 是否过期
- * @returns {boolean} 是否过期
  */
-export function isTokenExpired() {
+export function isTokenExpired(): boolean {
   const expiresTime = localStorage.getItem(TOKEN_EXPIRES_KEY)
   if (!expiresTime) return true
   return Date.now() > parseInt(expiresTime)
@@ -45,25 +43,23 @@ export function isTokenExpired() {
 
 /**
  * 获取用户信息
- * @returns {object|null} 用户信息
  */
-export function getUserInfo() {
+export function getUserInfo(): UserInfo | null {
   const userInfoStr = localStorage.getItem('toutiao_user_info')
   return userInfoStr ? JSON.parse(userInfoStr) : null
 }
 
 /**
  * 设置用户信息
- * @param {object} userInfo - 用户信息
  */
-export function setUserInfo(userInfo) {
+export function setUserInfo(userInfo: UserInfo): void {
   localStorage.setItem('toutiao_user_info', JSON.stringify(userInfo))
 }
 
 /**
  * 清除所有认证信息
  */
-export function clearAuth() {
+export function clearAuth(): void {
   removeToken()
   localStorage.removeItem('toutiao_user_info')
 }

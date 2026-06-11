@@ -1,10 +1,10 @@
-import axios from 'axios'
+import axios, { AxiosInstance, AxiosError, AxiosResponse } from 'axios'
 import { ElMessage } from 'element-plus'
 import { getToken, removeToken } from './auth'
 import router from '@/router'
 
 // 创建 Axios 实例
-const service = axios.create({
+const service: AxiosInstance = axios.create({
   baseURL: '/api',
   timeout: 10000,
   headers: {
@@ -30,7 +30,7 @@ service.interceptors.request.use(
 
 // 响应拦截器
 service.interceptors.response.use(
-  (response) => {
+  (response: AxiosResponse) => {
     const res = response.data
 
     // 根据业务状态码判断
@@ -41,7 +41,7 @@ service.interceptors.response.use(
 
     return res
   },
-  (error) => {
+  (error: AxiosError) => {
     // 处理 HTTP 状态码
     if (error.response) {
       switch (error.response.status) {
@@ -57,10 +57,10 @@ service.interceptors.response.use(
           ElMessage.error('服务器错误')
           break
         default:
-          ElMessage.error(error.message || '网络请求失败')
+          ElMessage.error((error.message as string) || '网络请求失败')
       }
     } else {
-      ElMessage.error(error.message || '网络请求失败')
+      ElMessage.error((error.message as string) || '网络请求失败')
     }
 
     return Promise.reject(error)

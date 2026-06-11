@@ -3,12 +3,18 @@
  */
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { login as loginApi, register as registerApi, getUserInfo as getUserInfoApi, updateUserInfo as updateUserInfoApi, updatePassword as updatePasswordApi } from '@/api/user'
-import { setToken, removeToken, setUserInfo, clearAuth, getUserInfo } from '@/utils/auth'
+import {
+  login as loginApi,
+  register as registerApi,
+  getUserInfo as getUserInfoApi,
+  updateUserInfo as updateUserInfoApi,
+  updatePassword as updatePasswordApi
+} from '@/api/user'
+import { setToken, setUserInfo, clearAuth, getUserInfo } from '@/utils/auth'
 
 export const useUserStore = defineStore('user', () => {
   // 状态
-  const userInfo = ref(null)
+  const userInfo = ref<UserInfo | null>(null)
   const isLoggedIn = ref(false)
 
   // 初始化用户信息
@@ -21,7 +27,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   // 登录
-  const login = async (data) => {
+  const login = async (data: { username: string; password: string }) => {
     const res = await loginApi(data)
     setToken(res.token)
     userInfo.value = res.user
@@ -31,7 +37,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   // 注册
-  const register = async (data) => {
+  const register = async (data: { username: string; password: string }) => {
     const res = await registerApi(data)
     setToken(res.token)
     userInfo.value = res.user
@@ -44,8 +50,10 @@ export const useUserStore = defineStore('user', () => {
   const fetchUserInfo = async () => {
     try {
       const res = await getUserInfoApi()
-      userInfo.value = res.user || res
-      setUserInfo(userInfo.value)
+      userInfo.value = res.user || res.data
+      if (userInfo.value) {
+        setUserInfo(userInfo.value)
+      }
       isLoggedIn.value = true
     } catch (error) {
       console.error('获取用户信息失败', error)
@@ -53,15 +61,17 @@ export const useUserStore = defineStore('user', () => {
   }
 
   // 更新用户信息
-  const updateUserInfo = async (data) => {
+  const updateUserInfo = async (data: Partial<UserInfo>) => {
     const res = await updateUserInfoApi(data)
-    userInfo.value = { ...userInfo.value, ...data }
-    setUserInfo(userInfo.value)
+    if (userInfo.value) {
+      userInfo.value = { ...userInfo.value, ...data }
+      setUserInfo(userInfo.value)
+    }
     return res
   }
 
   // 修改密码
-  const changePassword = async (data) => {
+  const changePassword = async (data: { oldPassword: string; newPassword: string }) => {
     return await updatePasswordApi(data)
   }
 

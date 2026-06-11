@@ -3,11 +3,17 @@
  */
 import request from '@/utils/request'
 
+// 请求参数类型
+interface NewsListParams {
+  page?: number
+  pageSize?: number
+  categoryId?: number | null
+}
+
 /**
  * 获取新闻分类列表
- * @returns {promise} 返回分类列表
  */
-export function getCategories() {
+export function getCategories(): Promise<ApiResponse<CategoryItem[]>> {
   return request({
     url: '/news/categories',
     method: 'get'
@@ -16,10 +22,8 @@ export function getCategories() {
 
 /**
  * 获取新闻列表
- * @param {object} params - 查询参数 { page, pageSize, categoryId }
- * @returns {promise} 返回新闻列表
  */
-export function getNewsList(params) {
+export function getNewsList(params: NewsListParams): Promise<ApiResponse<NewsItem[]>> {
   return request({
     url: '/news/list',
     method: 'get',
@@ -29,10 +33,8 @@ export function getNewsList(params) {
 
 /**
  * 获取新闻详情
- * @param {number} id - 新闻ID
- * @returns {promise} 返回新闻详情
  */
-export function getNewsDetail(id) {
+export function getNewsDetail(id: number): Promise<ApiResponse<NewsItem>> {
   return request({
     url: `/news/detail/${id}`,
     method: 'get'
