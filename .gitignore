@@ -33,3 +33,6 @@ tmp/
 # 系统文件（Windows/mac）
 .DS_Store
 Thumbs.db
+
+# PyCharm
+*.iml
