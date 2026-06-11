@@ -39,6 +39,7 @@ class Book(Base):
     name: Mapped[str] = mapped_column(String(255), index=True, comment="书名")
     author: Mapped[str] = mapped_column(String(255), index=True, comment="作者")
     price: Mapped[int] = mapped_column(Integer, index=True, comment="价格")
+    type: Mapped[int] = mapped_column(Integer, index=True, comment="类别")
 
 
 # 3.创建数据库表 -> FastAPI 启动的时候调用建表

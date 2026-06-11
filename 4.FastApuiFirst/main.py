@@ -34,17 +34,25 @@ app.include_router(router)
 @app.middleware("http")
 async def add_middleware2(request, call_next):
     print("中间件2触发了")
-    response = await call_next(request)
-    print("中间件2执行完毕了")
-    return response
+    try:
+        response = await call_next(request)
+        print("中间件2执行完毕了")
+        return response
+    except Exception as e:
+        print(f"中间件2捕获异常: {e}")
+        raise
 
 
 @app.middleware("http")
 async def add_middleware(request, call_next):
     print("中间件1触发了")
-    response = await call_next(request)
-    print("中间件1执行完毕了")
-    return response
+    try:
+        response = await call_next(request)
+        print("中间件1执行完毕了")
+        return response
+    except Exception as e:
+        print(f"中间件1捕获异常: {e}")
+        raise
 
 
 # ---------- 根路由 ----------
