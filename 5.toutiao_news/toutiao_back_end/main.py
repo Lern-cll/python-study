@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from routers import news
 
 app = FastAPI()
 
@@ -7,7 +8,13 @@ app = FastAPI()
 async def root():
     return {"message": "Hello World"}
 
+# 挂载 注册路由
+app.include_router(news.router)
 
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+
+
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="127.0.0.1", port=10001, reload=True)
