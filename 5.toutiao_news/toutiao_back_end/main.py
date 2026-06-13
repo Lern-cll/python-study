@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from routers import news
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
@@ -12,9 +13,15 @@ async def root():
 app.include_router(news.router)
 
 
+# 添加cors中间件
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # 允许访问的源
+    allow_credentials=True, # =允许携带cookie
+    allow_methods=["*"], # 允许所有的请求方法
+    allow_headers=["*"], # 允许所有的请求头
+)
 
-
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=10001, reload=True)
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run("main:app", host="127.0.0.1", port=10001, reload=True)

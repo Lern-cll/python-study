@@ -1,0 +1,54 @@
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\uvicorn\protocols\http\h11_impl.py", line 415, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 62, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\fastapi\applications.py", line 1159, in __call__
+    await super().__call__(scope, receive, send)
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\starlette\applications.py", line 90, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\starlette\middleware\cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\starlette\routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\starlette\routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\starlette\routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\fastapi\routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\fastapi\routing.py", line 120, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\fastapi\routing.py", line 674, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\.venv\Lib\site-packages\fastapi\routing.py", line 328, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\routers\news.py", line 61, in get_news_list
+    news_list = await news.get_news_list(db, category_id, page, page_size)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\___project___\Python_excise\python-study\5.toutiao_news\toutiao_back_end\crud\news.py", line 15, in get_news_list
+    stmt = select(news).where(news.category_id == category_id).offset(offset).limit(limit)
+                  ^^^^
+NameError: name 'news' is not defined

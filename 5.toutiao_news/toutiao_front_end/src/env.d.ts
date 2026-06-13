@@ -18,13 +18,27 @@ interface UserInfo {
 interface NewsItem {
   id: number
   title: string
-  source?: string
-  coverImage?: string
+  description?: string
+  author?: string
+  image?: string
   content?: string
   views?: number
+  publish_time?: string
   publishTime?: string
-  createTime?: string
+  created_at?: string
+  updated_at?: string
+  category_id?: number
   categoryId?: number
+  relatedNews?: RelatedNewsItem[]
+}
+
+interface RelatedNewsItem {
+  id: number
+  title: string
+  image?: string
+  author?: string
+  publishTime?: string
+  views?: number
 }
 
 interface CategoryItem {

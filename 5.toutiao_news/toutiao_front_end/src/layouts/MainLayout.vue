@@ -1,13 +1,15 @@
 <template>
   <div class="main-layout">
     <div class="main-content">
-      <router-view v-slot="{ Component }">
+      <router-view v-slot="{ Component, route }">
         <transition name="slide" mode="out-in">
-          <component :is="Component" />
+          <keep-alive :include="cachedViews">
+            <component :is="Component" :key="route.fullPath" />
+          </keep-alive>
         </transition>
       </router-view>
     </div>
-    <div class="main-tabbar">
+    <div v-if="!hideTabBar" class="main-tabbar">
       <div
         v-for="tab in tabs"
         :key="tab.path"
@@ -38,6 +40,16 @@ const tabs = [
 ]
 
 const currentPath = computed(() => route.path)
+
+// 需要被 keep-alive 缓存的组件名（取自路由的 name 字段）
+const cachedViews = computed(() => {
+  return router.getRoutes()
+    .filter((r) => r.meta?.keepAlive && r.name)
+    .map((r) => r.name)
+})
+
+// 详情页等子路由通过 meta.hideTabBar 隐藏底部 TabBar
+const hideTabBar = computed(() => Boolean(route.meta?.hideTabBar))
 
 const handleTabClick = (tab) => {
   if (tab.requiresAuth && !localStorage.getItem('toutiao_token')) {

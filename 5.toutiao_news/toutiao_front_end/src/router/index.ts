@@ -34,7 +34,7 @@ const routes: RouteRecordRaw[] = [
         path: '/home',
         name: 'Home',
         component: Home,
-        meta: { title: '首页' }
+        meta: { title: '首页', keepAlive: true }
       },
       {
         path: '/ai-chat',
@@ -47,14 +47,14 @@ const routes: RouteRecordRaw[] = [
         name: 'Mine',
         component: Mine,
         meta: { title: '我的', requiresAuth: true }
+      },
+      {
+        path: '/news/:id',
+        name: 'NewsDetail',
+        component: NewsDetail,
+        meta: { title: '新闻详情', hideTabBar: true }
       }
     ]
-  },
-  {
-    path: '/news/:id',
-    name: 'NewsDetail',
-    component: NewsDetail,
-    meta: { title: '新闻详情' }
   },
   {
     path: '/user-info',

@@ -2,17 +2,18 @@
   <div class="news-item" @click="handleClick">
     <div class="news-content">
       <h3 class="news-title text-ellipsis-2">{{ news.title }}</h3>
+      <p class="news-desc text-ellipsis-2">{{ news.description }}</p>
       <div class="news-info">
-        <span class="news-source">{{ news.source || '头条号' }}</span>
-        <span class="news-time">{{ formatTime(news.publishTime || news.createTime) }}</span>
+        <span class="news-source">{{ news.author || '头条号' }}</span>
+        <span class="news-time">{{ formatTime(news.publish_time || news.created_at) }}</span>
         <span class="news-views">
           <el-icon><View /></el-icon>
-          {{ news.views || 0 }}
+          {{ formatViews(news.views) }}
         </span>
       </div>
     </div>
-    <div v-if="news.coverImage" class="news-image">
-      <img :src="news.coverImage" :alt="news.title" />
+    <div v-if="news.image" class="news-image">
+      <img :src="news.image" :alt="news.title" />
     </div>
   </div>
 </template>
@@ -49,6 +50,12 @@ const formatTime = (time) => {
   if (days < 7) return `${days}天前`
   return date.toLocaleDateString()
 }
+
+const formatViews = (views) => {
+  const n = Number(views) || 0
+  if (n >= 10000) return `${(n / 10000).toFixed(1)}万`
+  return n
+}
 </script>
 
 <style lang="scss" scoped>
@@ -65,12 +72,21 @@ const formatTime = (time) => {
     flex-direction: column;
     justify-content: space-between;
     margin-right: 12px;
+    min-width: 0;
 
     .news-title {
       font-size: 1rem;
       line-height: 1.4;
       color: #333;
-      margin-bottom: 8px;
+      margin: 0 0 6px;
+      font-weight: 600;
+    }
+
+    .news-desc {
+      font-size: 0.8125rem;
+      line-height: 1.4;
+      color: #666;
+      margin: 0 0 8px;
     }
 
     .news-info {
@@ -100,6 +116,7 @@ const formatTime = (time) => {
     border-radius: 6px;
     overflow: hidden;
     flex-shrink: 0;
+    background: #f0f0f0;
 
     img {
       width: 100%;
@@ -107,5 +124,13 @@ const formatTime = (time) => {
       object-fit: cover;
     }
   }
+}
+
+.text-ellipsis-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

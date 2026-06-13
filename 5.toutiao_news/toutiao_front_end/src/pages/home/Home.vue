@@ -8,48 +8,187 @@
       :categories="categories"
       @change="handleCategoryChange"
     />
-    <div class="news-list" v-loading="loading">
-      <NewsItem
-        v-for="item in newsList"
-        :key="item.id"
-        :news="item"
-      />
-      <div v-if="!loading && newsList.length === 0" class="empty-state">
-        <el-empty description="暂无数据" />
+    <div
+      class="news-scroll"
+      ref="scrollRef"
+      @touchstart="onTouchStart"
+      @touchmove="onTouchMove"
+      @touchend="onTouchEnd"
+    >
+      <div
+        class="pull-refresh"
+        :class="{ active: pullDistance > 0, refreshing: refreshing }"
+        :style="{ height: pullDistance + 'px' }"
+      >
+        <div class="pull-refresh-inner">
+          <el-icon
+            :class="{ 'is-loading': refreshing }"
+            :style="iconTransform"
+          >
+            <Loading v-if="refreshing" />
+            <ArrowDown v-else />
+          </el-icon>
+          <span class="pull-text">{{ refreshText }}</span>
+        </div>
       </div>
-      <div v-if="loading" class="loading-more">
-        <el-icon class="is-loading"><Loading /></el-icon>
-        <span>加载中...</span>
-      </div>
-      <div v-if="!loading && hasMore" class="load-more" @click="loadMore">
-        <span>加载更多</span>
+      <div class="news-list" v-loading="loading">
+        <NewsItem
+          v-for="item in newsList"
+          :key="item.id"
+          :news="item"
+        />
+        <div v-if="!loading && newsList.length === 0" class="empty-state">
+          <el-empty description="暂无数据" />
+        </div>
+        <div v-if="loading && newsList.length > 0" class="loading-more">
+          <el-icon class="is-loading"><Loading /></el-icon>
+          <span>加载中...</span>
+        </div>
+        <div v-if="!loading && hasMore && newsList.length > 0" class="load-more" @click="loadMore">
+          <span>加载更多</span>
+        </div>
+        <div v-if="!loading && !hasMore && newsList.length > 0" class="no-more">
+          <span>没有更多了</span>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onActivated, onDeactivated, computed, watch, nextTick } from 'vue'
 import { useNewsStore } from '@/pinia/newsStore'
 import CategoryNav from '@/components/CategoryNav.vue'
 import NewsItem from '@/components/NewsItem.vue'
-import { Loading } from '@element-plus/icons-vue'
+import { Loading, ArrowDown } from '@element-plus/icons-vue'
 
 const newsStore = useNewsStore()
 
 const currentCategory = ref(null)
-const categories = computed(() => [
-  { id: null, name: '推荐' },
-  ...newsStore.categories
-])
+const categories = computed(() => newsStore.categories)
 const newsList = computed(() => newsStore.newsList)
 const loading = computed(() => newsStore.loading)
-const hasMore = computed(() => newsList.value.length < newsStore.total)
+const hasMore = computed(() => newsStore.hasMore)
+
+// 下拉刷新
+const scrollRef = ref(null)
+const scrollContainer = ref(null)
+const pullDistance = ref(0)
+const refreshing = ref(false)
+const startY = ref(0)
+const startScrollTop = ref(0)
+const threshold = 60
+const maxDistance = 100
+
+// 离开 Home 时保存滚动位置（keep-alive 场景下 onDeactivated 触发）
+const savedScrollTop = ref(0)
+
+const refreshText = computed(() => {
+  if (refreshing.value) return '正在刷新...'
+  if (pullDistance.value >= threshold) return '松开立即刷新'
+  return '下拉刷新'
+})
+
+const iconTransform = computed(() => {
+  if (refreshing.value) return {}
+  const deg = pullDistance.value >= threshold ? 180 : pullDistance.value * 2
+  return { transform: `rotate(${deg}deg)` }
+})
+
+const findScrollParent = (el) => {
+  if (!el) return null
+  let node = el.parentElement
+  while (node) {
+    const style = window.getComputedStyle(node)
+    if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
+      return node
+    }
+    node = node.parentElement
+  }
+  return null
+}
+
+const onTouchStart = (e) => {
+  if (refreshing.value) return
+  if (!scrollContainer.value) {
+    scrollContainer.value = findScrollParent(scrollRef.value)
+  }
+  startY.value = e.touches[0].clientY
+  startScrollTop.value = scrollContainer.value?.scrollTop || 0
+}
+
+const onTouchMove = (e) => {
+  if (refreshing.value) return
+  // 只在列表处于顶部时响应下拉
+  if (startScrollTop.value > 0) return
+  const currentY = e.touches[0].clientY
+  const diff = currentY - startY.value
+  if (diff <= 0) {
+    pullDistance.value = 0
+    return
+  }
+  // 阻尼效果
+  pullDistance.value = Math.min(diff * 0.4, maxDistance)
+}
+
+const onTouchEnd = async () => {
+  if (refreshing.value) return
+  if (pullDistance.value >= threshold) {
+    refreshing.value = true
+    pullDistance.value = threshold
+    try {
+      newsStore.resetPage()
+      await newsStore.fetchNewsList({ categoryId: currentCategory.value })
+    } finally {
+      refreshing.value = false
+      pullDistance.value = 0
+    }
+  } else {
+    pullDistance.value = 0
+  }
+}
 
 onMounted(async () => {
   await newsStore.fetchCategories()
-  await newsStore.fetchNewsList()
+  if (newsStore.categories.length > 0 && currentCategory.value == null) {
+    currentCategory.value = newsStore.categories[0].id
+  }
+  if (currentCategory.value != null) {
+    await newsStore.fetchNewsList({ categoryId: currentCategory.value })
+  }
 })
+
+// 被 keep-alive 缓存后，离开时记录滚动位置，回来时恢复
+onActivated(() => {
+  // 已经在 Home 中时不做处理（首次进入会触发 onMounted）
+  if (!scrollContainer.value && scrollRef.value) {
+    scrollContainer.value = findScrollParent(scrollRef.value)
+  }
+  if (savedScrollTop.value > 0 && scrollContainer.value) {
+    nextTick(() => {
+      scrollContainer.value?.scrollTo(0, savedScrollTop.value)
+    })
+  }
+})
+
+onDeactivated(() => {
+  // 跳到详情页时把当前滚动位置存下来
+  if (scrollContainer.value) {
+    savedScrollTop.value = scrollContainer.value.scrollTop
+  }
+})
+
+// 分类加载完成后，自动选中第一个
+watch(
+  () => newsStore.categories,
+  (list) => {
+    if (currentCategory.value == null && list.length > 0) {
+      currentCategory.value = list[0].id
+      newsStore.resetPage()
+      newsStore.fetchNewsList({ categoryId: currentCategory.value })
+    }
+  }
+)
 
 const handleCategoryChange = async (category) => {
   newsStore.resetPage()
@@ -65,15 +204,46 @@ const loadMore = async () => {
 .home-page {
   background: #f5f5f5;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 
   .header {
     background: #e63946;
     color: #fff;
     padding: 12px 15px;
+    flex-shrink: 0;
 
     .logo {
       font-size: 1.25rem;
       font-weight: 700;
+    }
+  }
+
+  .news-scroll {
+    flex: 1;
+    position: relative;
+    touch-action: pan-y;
+  }
+
+  .pull-refresh {
+    width: 100%;
+    overflow: hidden;
+    transition: height 0.2s ease;
+
+    .pull-refresh-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 60px;
+      color: #999;
+      font-size: 0.8125rem;
+      gap: 6px;
+    }
+
+    .el-icon {
+      font-size: 16px;
+      transition: transform 0.2s ease;
     }
   }
 
@@ -105,6 +275,13 @@ const loadMore = async () => {
     &:hover {
       background: #fafafa;
     }
+  }
+
+  .no-more {
+    text-align: center;
+    padding: 15px;
+    color: #bbb;
+    font-size: 0.8125rem;
   }
 }
 </style>

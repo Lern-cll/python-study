@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from config.db_conf import get_db
 from crud import news
+from typing import Optional
+from fastapi import Query
 
 # 创建 APIRouter 实例
 # prefix 前缀 (API 接口规范文档)
@@ -42,4 +44,64 @@ async def get_categories(
             "total_page": 0,
         },
         "message": "获取新闻分类"
+    }
+
+
+# 获取新闻列表
+# 思路： 处理分页规则 -> 查询新闻列表 -> 计算总量 -> 计算是否还有更多
+@router.get('/list')
+async def get_news_list(
+    db: AsyncSession = Depends(get_db),
+    # 分类参数  ... 表示可以不传, alias="categoryId" 表示在请求参数中用 categoryId 替换 category_id 参数
+    category_id: int = Query(..., alias="categoryId"),
+    # 分页参数
+    page: int = 1,
+    page_size: int = Query(10, le=100, alias="pageSize"),
+):
+    news_list = await news.get_news_list(db, category_id, page, page_size)
+    total_count = await news.get_news_total(db, category_id)
+    # 总量 > 跳过的 + 当前列表中的数量
+    has_more = total_count > len(news_list) + page_size
+    return {
+        "code": 200,
+        "message":"success",
+        "data":{
+            "list": news_list,
+            "total": total_count,
+            "hasMore": has_more
+        }
+    }
+
+
+# 获取新闻详情
+@router.get('/detail')
+async def get_news_detail(
+    db: AsyncSession = Depends(get_db),
+    id: int = Query(..., alias="id"),
+):
+    # 获取新闻详情 + 浏览量+1  + 相关新闻
+
+    news_detail = await news.get_news_detail(db, id)
+    # 更新浏览量
+    await news.update_news_views(db, id)
+    # 获取相关新闻
+    related_news = await news.get_related_news(db, id, news_detail.category_id)
+ 
+    if not news_detail:
+        raise HTTPException(status_code=404, detail="新闻不存在")
+    
+    return {
+        "code": 200,
+        "message": "success",
+        "data": {
+            "id": news_detail.id,
+            "title": news_detail.title,
+            "content": news_detail.content,
+            "image": news_detail.image,
+            "author": news_detail.author,
+            "publishTime": news_detail.publish_time,
+            "categoryId": news_detail.category_id,
+            "views": news_detail.views,
+            "relatedNews": related_news
+        }
     }

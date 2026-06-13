@@ -34,11 +34,11 @@ export function addFavorite(newsId: number): Promise<ApiResponse> {
 /**
  * 取消收藏
  */
-export function removeFavorite(favoriteId: number): Promise<ApiResponse> {
+export function removeFavorite(newsId: number): Promise<ApiResponse> {
   return request({
     url: '/favorite/remove',
     method: 'delete',
-    data: { favoriteId }
+    params: { newsId }
   })
 }
 

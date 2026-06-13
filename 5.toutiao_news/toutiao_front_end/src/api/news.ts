@@ -36,7 +36,8 @@ export function getNewsList(params: NewsListParams): Promise<ApiResponse<NewsIte
  */
 export function getNewsDetail(id: number): Promise<ApiResponse<NewsItem>> {
   return request({
-    url: `/news/detail/${id}`,
-    method: 'get'
+    url: '/news/detail',
+    method: 'get',
+    params: { id }
   })
 }
