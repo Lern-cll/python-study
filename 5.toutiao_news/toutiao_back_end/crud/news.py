@@ -29,10 +29,10 @@ async def get_news_detail(db: AsyncSession, id: int):
     return result.scalar_one_or_none() # 如果没有数据，返回 None
 
 # 更新新闻浏览量
-async def update_news_views(db: AsyncSession, id: int):
+async def increase_news_views(db: AsyncSession, id: int):
     stmt = update(News).where(News.id == id).values(views=News.views + 1)
     result = await db.execute(stmt)
-    await db.commit()
+    await db.commit() # 这里是立即更新的意思
     return result.rowcount > 0 # 返回影响的行数
 
 # 获取相关新闻

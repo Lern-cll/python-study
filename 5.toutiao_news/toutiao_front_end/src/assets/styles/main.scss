@@ -1,5 +1,16 @@
 /* 移动端适配 - 基础样式 */
 
+/* Element Plus 主题色覆盖 */
+:root {
+  --el-color-primary: #e63946;
+  --el-color-primary-light-3: #ed6a6a;
+  --el-color-primary-light-5: #f08a8a;
+  --el-color-primary-light-7: #f4a9a9;
+  --el-color-primary-light-8: #f6b8b8;
+  --el-color-primary-light-9: #f8c7c7;
+  --el-color-primary-dark-2: #c62b36;
+}
+
 /* 重置样式 */
 * {
   margin: 0;

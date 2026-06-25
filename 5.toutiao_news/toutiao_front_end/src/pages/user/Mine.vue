@@ -3,8 +3,7 @@
     <div class="user-header">
       <div class="user-info" @click="handleUserInfo">
         <div class="avatar">
-          <img v-if="userInfo?.avatar" :src="userInfo.avatar" alt="avatar" />
-          <el-icon v-else :size="40"><User /></el-icon>
+          <img :src="userInfo?.avatar || defaultAvatar" alt="avatar" />
         </div>
         <div class="info">
           <div class="nickname">{{ userInfo?.nickname || userInfo?.username || '未登录' }}</div>
@@ -54,6 +53,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/pinia/userStore'
 import { User, ArrowRight, Star, Clock, Setting } from '@element-plus/icons-vue'
 import { ElMessageBox } from 'element-plus'
+import defaultAvatar from '@/assets/imgs/photo.jpeg'
 
 const router = useRouter()
 const userStore = useUserStore()

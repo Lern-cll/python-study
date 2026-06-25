@@ -4,72 +4,96 @@
       <el-icon @click="router.back()"><ArrowLeft /></el-icon>
       <span>个人信息</span>
     </div>
-    <div class="content">
-      <el-form label-position="top">
-        <el-form-item label="头像">
-          <div class="avatar-upload">
-            <div class="avatar-preview">
-              <img v-if="form.avatar" :src="form.avatar" alt="avatar" />
-              <el-icon v-else :size="40"><User /></el-icon>
-            </div>
-            <el-button size="small">更换头像</el-button>
-          </div>
-        </el-form-item>
-        <el-form-item label="昵称">
-          <el-input v-model="form.nickname" placeholder="请输入昵称" />
-        </el-form-item>
-        <el-form-item label="邮箱">
-          <el-input v-model="form.email" placeholder="请输入邮箱" />
-        </el-form-item>
-        <el-form-item label="手机号">
-          <el-input v-model="form.phone" placeholder="请输入手机号" />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" :loading="saving" block @click="handleSave">
-            保存修改
-          </el-button>
-        </el-form-item>
-      </el-form>
 
-      <div class="divider"></div>
-
-      <div class="password-section">
-        <h3>修改密码</h3>
-        <el-form label-position="top">
-          <el-form-item label="旧密码">
-            <el-input v-model="passwordForm.oldPassword" type="password" placeholder="请输入旧密码" show-password />
-          </el-form-item>
-          <el-form-item label="新密码">
-            <el-input v-model="passwordForm.newPassword" type="password" placeholder="请输入新密码" show-password />
-          </el-form-item>
-          <el-form-item>
-            <el-button type="warning" :loading="passwordSaving" block @click="handleChangePassword">
-              修改密码
-            </el-button>
-          </el-form-item>
-        </el-form>
+    <div class="list-section">
+      <div class="list-item" @click="showAvatarPicker = true">
+        <span class="label">头像</span>
+        <div class="value avatar-value">
+          <img :src="form.avatar || defaultAvatar" alt="avatar" class="avatar-img" />
+          <el-icon><ArrowRight /></el-icon>
+        </div>
+      </div>
+      <div class="list-item">
+        <span class="label">用户名</span>
+        <span class="value">{{ form.username || userInfo?.username || '-' }}</span>
+      </div>
+      <div class="list-item">
+        <span class="label">账号ID</span>
+        <span class="value id-value">ID: {{ form.id || userInfo?.id || '-' }}</span>
+      </div>
+      <div class="list-item" @click="showNicknameEdit = true">
+        <span class="label">个人简介</span>
+        <span class="value editable">
+          {{ form.bio || '这个人很懒，什么都没写' }}
+          <el-icon><ArrowRight /></el-icon>
+        </span>
       </div>
     </div>
+
+    <div class="list-section">
+      <div class="list-item" @click="showPasswordDialog = true">
+        <span class="label">修改密码</span>
+        <span class="value editable">
+          <el-icon><ArrowRight /></el-icon>
+        </span>
+      </div>
+    </div>
+
+    <!-- 昵称编辑弹窗 -->
+    <el-dialog v-model="showNicknameEdit" title="编辑个人简介" width="300px">
+      <el-input v-model="tempBio" placeholder="请输入个人简介" />
+      <template #footer>
+        <el-button @click="showNicknameEdit = false">取消</el-button>
+        <el-button type="primary" @click="saveBio">确定</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 修改密码弹窗 -->
+    <el-dialog v-model="showPasswordDialog" title="修改密码" width="300px">
+      <el-form label-position="top">
+        <el-form-item label="旧密码">
+          <el-input v-model="passwordForm.oldPassword" type="password" placeholder="请输入旧密码" show-password />
+        </el-form-item>
+        <el-form-item label="新密码">
+          <el-input v-model="passwordForm.newPassword" type="password" placeholder="请输入新密码" show-password />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="showPasswordDialog = false">取消</el-button>
+        <el-button type="primary" :loading="passwordSaving" @click="handleChangePassword">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/pinia/userStore'
-import { ArrowLeft, User } from '@element-plus/icons-vue'
+import { ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import defaultAvatar from '@/assets/imgs/photo.jpeg'
 
 const router = useRouter()
 const userStore = useUserStore()
 
+const userInfo = computed(() => userStore.userInfo)
+
 const saving = ref(false)
 const passwordSaving = ref(false)
+const showNicknameEdit = ref(false)
+const showPasswordDialog = ref(false)
+const showAvatarPicker = ref(false)
+const tempBio = ref('')
+
 const form = reactive({
+  id: '',
+  username: '',
   nickname: '',
   email: '',
   phone: '',
-  avatar: ''
+  avatar: '',
+  bio: ''
 })
 
 const passwordForm = reactive({
@@ -80,18 +104,21 @@ const passwordForm = reactive({
 onMounted(() => {
   if (userStore.userInfo) {
     Object.assign(form, userStore.userInfo)
+    tempBio.value = form.bio || ''
   }
 })
 
-const handleSave = async () => {
+const saveBio = async () => {
+  form.bio = tempBio.value
   try {
     saving.value = true
-    await userStore.updateUserInfo(form)
+    await userStore.updateUserInfo({ bio: form.bio })
     ElMessage.success('修改成功')
   } catch (e) {
     ElMessage.error('修改失败')
   } finally {
     saving.value = false
+    showNicknameEdit.value = false
   }
 }
 
@@ -106,6 +133,7 @@ const handleChangePassword = async () => {
     ElMessage.success('密码修改成功')
     passwordForm.oldPassword = ''
     passwordForm.newPassword = ''
+    showPasswordDialog.value = false
   } catch (e) {
     ElMessage.error('密码修改失败')
   } finally {
@@ -123,11 +151,11 @@ const handleChangePassword = async () => {
     display: flex;
     align-items: center;
     padding: 12px 15px;
-    background: #fff;
-    border-bottom: 1px solid #f0f0f0;
+    background: linear-gradient(135deg, #e63946 0%, #c62b36 100%);
 
     .el-icon {
       font-size: 20px;
+      color: #fff;
       cursor: pointer;
     }
 
@@ -136,58 +164,60 @@ const handleChangePassword = async () => {
       text-align: center;
       font-size: 1rem;
       font-weight: 600;
+      color: #fff;
     }
   }
 
-  .content {
-    padding: 15px;
+  .list-section {
+    background: #fff;
+    margin-top: 10px;
 
-    .el-form {
-      background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-
-      :deep(.el-form-item) {
-        margin-bottom: 20px;
-      }
-    }
-
-    .avatar-upload {
+    .list-item {
       display: flex;
       align-items: center;
-      gap: 15px;
+      padding: 14px 15px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
 
-      .avatar-preview {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: #f0f0f0;
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .label {
+        font-size: 0.9375rem;
+        color: #333;
+        min-width: 80px;
+      }
+
+      .value {
+        flex: 1;
+        text-align: right;
+        font-size: 0.875rem;
+        color: #999;
         display: flex;
         align-items: center;
-        justify-content: center;
-        overflow: hidden;
+        justify-content: flex-end;
+        gap: 6px;
 
-        img {
-          width: 100%;
-          height: 100%;
+        &.editable {
+          color: #999;
+        }
+
+        &.id-value {
+          color: #bbb;
+        }
+
+        .avatar-img {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
           object-fit: cover;
         }
-      }
-    }
 
-    .divider {
-      height: 10px;
-    }
-
-    .password-section {
-      background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-
-      h3 {
-        font-size: 1rem;
-        font-weight: 600;
-        margin-bottom: 15px;
+        .el-icon {
+          color: #ccc;
+          font-size: 14px;
+        }
       }
     }
   }

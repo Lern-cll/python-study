@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from config.db_conf import get_db
 from crud import news
@@ -83,7 +83,7 @@ async def get_news_detail(
 
     news_detail = await news.get_news_detail(db, id)
     # 更新浏览量
-    await news.update_news_views(db, id)
+    await news.increase_news_views(db, id)
     # 获取相关新闻
     related_news = await news.get_related_news(db, id, news_detail.category_id)
  
