@@ -11,6 +11,7 @@
     <div
       class="news-scroll"
       ref="scrollRef"
+      @scroll="onScroll"
       @touchstart="onTouchStart"
       @touchmove="onTouchMove"
       @touchend="onTouchEnd"
@@ -43,9 +44,6 @@
         <div v-if="loading && newsList.length > 0" class="loading-more">
           <el-icon class="is-loading"><Loading /></el-icon>
           <span>加载中...</span>
-        </div>
-        <div v-if="!loading && hasMore && newsList.length > 0" class="load-more" @click="loadMore">
-          <span>加载更多</span>
         </div>
         <div v-if="!loading && !hasMore && newsList.length > 0" class="no-more">
           <span>没有更多了</span>
@@ -83,6 +81,43 @@ const maxDistance = 100
 // 离开 Home 时保存滚动位置（keep-alive 场景下 onDeactivated 触发）
 const savedScrollTop = ref(0)
 
+// 滚动自动加载
+let isLoadingMore = false
+let lastLoadMoreAt = 0
+
+const getScrollBottom = (container) =>
+  container.scrollHeight - container.scrollTop - container.clientHeight
+
+const tryLoadMore = async () => {
+  if (isLoadingMore || loading.value || refreshing.value || !hasMore.value) return
+  const now = Date.now()
+  if (now - lastLoadMoreAt < 500) return
+  lastLoadMoreAt = now
+  isLoadingMore = true
+  try {
+    await newsStore.loadMore({ categoryId: currentCategory.value })
+  } finally {
+    isLoadingMore = false
+  }
+}
+
+const onScroll = async (e) => {
+  if (isLoadingMore || loading.value || refreshing.value || !hasMore.value) return
+
+  // 使用真正的滚动容器
+  if (!scrollContainer.value && scrollRef.value) {
+    scrollContainer.value = findScrollParent(scrollRef.value)
+  }
+  const container = scrollContainer.value || scrollRef.value
+  if (!container || container.scrollHeight <= container.clientHeight) return
+  
+  const scrollBottom = getScrollBottom(container)
+  // 距离底部 200px 时触发加载
+  if (scrollBottom < 80) {
+    await tryLoadMore()
+  }
+}
+
 const refreshText = computed(() => {
   if (refreshing.value) return '正在刷新...'
   if (pullDistance.value >= threshold) return '松开立即刷新'
@@ -97,7 +132,7 @@ const iconTransform = computed(() => {
 
 const findScrollParent = (el) => {
   if (!el) return null
-  let node = el.parentElement
+  let node = el
   while (node) {
     const style = window.getComputedStyle(node)
     if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
@@ -150,19 +185,14 @@ const onTouchEnd = async () => {
 
 onMounted(async () => {
   await newsStore.fetchCategories()
-  if (newsStore.categories.length > 0 && currentCategory.value == null) {
-    currentCategory.value = newsStore.categories[0].id
-  }
-  if (currentCategory.value != null) {
-    await newsStore.fetchNewsList({ categoryId: currentCategory.value })
-  }
+  scrollContainer.value = scrollRef.value || findScrollParent(scrollRef.value)
 })
 
 // 被 keep-alive 缓存后，离开时记录滚动位置，回来时恢复
 onActivated(() => {
   // 已经在 Home 中时不做处理（首次进入会触发 onMounted）
-  if (!scrollContainer.value && scrollRef.value) {
-    scrollContainer.value = findScrollParent(scrollRef.value)
+  if (scrollRef.value) {
+    scrollContainer.value = scrollRef.value || findScrollParent(scrollRef.value)
   }
   if (savedScrollTop.value > 0 && scrollContainer.value) {
     nextTick(() => {
@@ -187,23 +217,21 @@ watch(
       newsStore.resetPage()
       newsStore.fetchNewsList({ categoryId: currentCategory.value })
     }
-  }
+  },
+  { immediate: true, flush: 'post' }
 )
 
 const handleCategoryChange = async (category) => {
   newsStore.resetPage()
   await newsStore.fetchNewsList({ categoryId: category.id })
 }
-
-const loadMore = async () => {
-  await newsStore.loadMore({ categoryId: currentCategory.value })
-}
 </script>
 
 <style lang="scss" scoped>
 .home-page {
   background: #f5f5f5;
-  min-height: 100vh;
+  height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -223,7 +251,10 @@ const loadMore = async () => {
   .news-scroll {
     flex: 1;
     position: relative;
+    min-height: 0;
     touch-action: pan-y;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .pull-refresh {

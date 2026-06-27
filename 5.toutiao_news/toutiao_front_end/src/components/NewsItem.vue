@@ -12,15 +12,25 @@
         </span>
       </div>
     </div>
-    <div v-if="news.image" class="news-image">
-      <img :src="news.image" :alt="news.title" />
+    <div v-if="news.image" class="news-image" :class="{ 'is-loading': !imageLoaded }">
+      <img 
+        v-show="imageLoaded"
+        :src="news.image" 
+        :alt="news.title"
+        @load="onImageLoad"
+        @error="onImageError"
+      />
+      <div v-if="!imageLoaded" class="image-placeholder">
+        <el-icon class="is-loading"><Loading /></el-icon>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { View } from '@element-plus/icons-vue'
+import { View, Loading } from '@element-plus/icons-vue'
 
 const props = defineProps({
   news: {
@@ -30,6 +40,15 @@ const props = defineProps({
 })
 
 const router = useRouter()
+const imageLoaded = ref(false)
+
+const onImageLoad = () => {
+  imageLoaded.value = true
+}
+
+const onImageError = () => {
+  imageLoaded.value = true
+}
 
 const handleClick = () => {
   router.push(`/news/${props.news.id}`)
@@ -117,11 +136,27 @@ const formatViews = (views) => {
     overflow: hidden;
     flex-shrink: 0;
     background: #f0f0f0;
+    position: relative;
 
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: opacity 0.3s ease;
+    }
+
+    .image-placeholder {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0f0f0;
+      color: #ccc;
+      font-size: 20px;
     }
   }
 }
