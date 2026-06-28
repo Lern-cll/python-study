@@ -45,8 +45,17 @@ export function isTokenExpired(): boolean {
  * 获取用户信息
  */
 export function getUserInfo(): UserInfo | null {
-  const userInfoStr = localStorage.getItem('toutiao_user_info')
-  return userInfoStr ? JSON.parse(userInfoStr) : null
+  try {
+    const userInfoStr = localStorage.getItem('toutiao_user_info')
+    if (!userInfoStr || userInfoStr === 'undefined' || userInfoStr === 'null') {
+      return null
+    }
+    return JSON.parse(userInfoStr)
+  } catch {
+    // 如果 JSON 解析失败，清除无效数据
+    localStorage.removeItem('toutiao_user_info')
+    return null
+  }
 }
 
 /**
