@@ -1,9 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from routers import news, users
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+
+from utils.exception_handlers import register_exception_handlers
 
 app = FastAPI()
 
+# 注册全局异常处理
+register_exception_handlers(app)
 
 @app.get("/")
 async def root():
@@ -21,6 +26,8 @@ app.add_middleware(
     allow_methods=["*"], # 允许所有的请求方法
     allow_headers=["*"], # 允许所有的请求头
 )
+
+
 
 if __name__ == "__main__":
     import uvicorn

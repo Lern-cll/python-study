@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timedelta
 
-from sqlalchemy import Select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.users import User, UserToken
@@ -11,8 +11,8 @@ from utils.security import get_password_hash
 
 # 通过用户名查询信息
 async def get_user_by_name( db: AsyncSession, username: str):
-    query =  Select(User).where(User.username == username)
-    result =  await db.execute(query)
+    query = select(User).where(User.username == username)
+    result = await db.execute(query)
     return result.scalar_one_or_none()
 
 # 创建用户
@@ -31,7 +31,7 @@ async def create_token (db: AsyncSession, user_id: int):
     token = str(uuid.uuid4())
     # timedelta(days=7, hours=0, minutes=0, seconds=0)
     expires_at = datetime.now() + timedelta(days=7)
-    query = Select(UserToken).where(UserToken.user_id == user_id)
+    query = select(UserToken).where(UserToken.user_id == user_id)
     result = await db.execute(query)
     user_token = result.scalar_one_or_none()
 
@@ -44,4 +44,4 @@ async def create_token (db: AsyncSession, user_id: int):
         await db.commit()
 
     await db.refresh(user_token)
-    return user_token
+    return token

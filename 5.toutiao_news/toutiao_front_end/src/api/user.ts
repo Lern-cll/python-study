@@ -47,8 +47,9 @@ export function login(data: LoginData): Promise<ApiResponse> {
 
 /**
  * 获取用户信息
+ * 后端返回 data: { userInfo: UserInfo, ... }
  */
-export function getUserInfo(): Promise<ApiResponse<UserInfo>> {
+export function getUserInfo(): Promise<ApiResponse<{ userInfo?: UserInfo; user?: UserInfo }>> {
   return request({
     url: '/user/info',
     method: 'get'
