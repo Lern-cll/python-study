@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from config.db_conf import get_db
-from crud.users import get_user_by_name, create_user, create_token
+from crud.users import get_user_by_name, create_user, create_token, authenticate_user
 from models.users import User
 from schemas.users import UserRequest, UserAuthResponse, UserInfoResponse
 from utils.response import success_response
@@ -48,21 +48,20 @@ async def register(
 
 # 用户登录
 @router.post("/login")
-async def login():
-    return {
-      "code": 200,
-      "message": "登录成功",
-      "data": {
-        "token": "用户访问令牌",
-        "userInfo": {
-          "id": 1,
-          "username": "example_user",
-          "nickname": null,
-          "avatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
-          "bio": "这个人很懒，什么都没留下"
-        }
-      }
-    }
+async def login(
+        user_info: UserRequest,
+        db: AsyncSession = Depends(get_db)
+):
+    #  登录的逻辑： 验证用户是否存在 -> 验证密码 -> 生成token -> 返回token和用户信息
+    user = await authenticate_user(db, user_info.username, user_info.password)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="用户名或密码错误")
+    token = await create_token(db, user.id)
+    response_data = UserAuthResponse(token=token, user_info=UserInfoResponse.model_validate(user))
+    return success_response(message="登录成功", data=response_data)
+
+
+
 
 # 通过用户名获取用户信息
 @router.get("/info")

@@ -1,5 +1,6 @@
 <template>
   <div class="mine-page">
+    <!-- 顶部用户信息卡：未登录时显示默认头像和"未登录" -->
     <div class="user-header">
       <div class="user-info" @click="handleUserInfo">
         <div class="avatar">
@@ -13,6 +14,7 @@
       </div>
     </div>
 
+    <!-- 第一组菜单：我的收藏、浏览历史 -->
     <div class="menu-section">
       <div class="menu-item" @click="router.push('/favorites')">
         <el-icon><Star /></el-icon>
@@ -26,6 +28,7 @@
       </div>
     </div>
 
+    <!-- 第二组菜单：个人设置 -->
     <div class="menu-section">
       <div class="menu-item" @click="router.push('/user-info')">
         <el-icon><Setting /></el-icon>
@@ -34,6 +37,7 @@
       </div>
     </div>
 
+    <!-- 底部按钮：根据登录态切换「退出登录 / 登录注册」 -->
     <div class="logout-section" v-if="isLoggedIn">
       <el-button type="danger" plain class="logout-btn" @click="handleLogout">
         退出登录
@@ -58,9 +62,14 @@ import defaultAvatar from '@/assets/imgs/photo.jpeg'
 const router = useRouter()
 const userStore = useUserStore()
 
+// 当前用户信息（来自 store）
 const userInfo = computed(() => userStore.userInfo)
+// 是否已登录
 const isLoggedIn = computed(() => userStore.isLoggedIn)
 
+/**
+ * 点击用户信息卡：已登录跳个人设置页，未登录跳登录页
+ */
 const handleUserInfo = () => {
   if (isLoggedIn.value) {
     router.push('/user-info')
@@ -69,6 +78,9 @@ const handleUserInfo = () => {
   }
 }
 
+/**
+ * 退出登录：二次确认后清空 store 状态并跳转登录页
+ */
 const handleLogout = async () => {
   try {
     await ElMessageBox.confirm('确定要退出登录吗？', '提示', {

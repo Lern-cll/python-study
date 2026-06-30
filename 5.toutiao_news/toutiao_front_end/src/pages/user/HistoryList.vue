@@ -1,5 +1,6 @@
 <template>
   <div class="history-list-page">
+    <!-- 顶部：返回 + 标题 + 清空按钮（仅在有数据时显示） -->
     <div class="header">
       <el-icon @click="router.back()"><ArrowLeft /></el-icon>
       <span>浏览历史</span>
@@ -8,6 +9,7 @@
       </el-button>
     </div>
     <div class="content" v-loading="loading">
+      <!-- 历史列表：每项含新闻卡片 + 删除按钮，删除按钮 .stop 阻止冒泡 -->
       <div
         v-for="item in list"
         :key="item.id"
@@ -19,10 +21,12 @@
           <el-icon><Delete /></el-icon>
         </div>
       </div>
+      <!-- 空状态 -->
       <div v-if="!loading && list.length === 0" class="empty-state">
         <el-icon :size="48"><Clock /></el-icon>
         <p>暂无浏览记录</p>
       </div>
+      <!-- 加载更多 -->
       <div v-if="hasMore" class="load-more" @click="loadMore">
         <span v-if="loadingMore">加载中...</span>
         <span v-else>加载更多</span>
@@ -41,17 +45,25 @@ import NewsItem from '@/components/NewsItem.vue'
 
 const router = useRouter()
 
+// 首次加载列表的 loading
 const loading = ref(false)
+// 加载更多时的 loading
 const loadingMore = ref(false)
+// 浏览历史列表
 const list = ref([])
+// 当前页码（分页）
 const page = ref(1)
+// 每页条数
 const pageSize = ref(10)
+// 是否还有更多可加载
 const hasMore = ref(false)
 
+/** 进入页面：拉取第一页历史记录 */
 onMounted(() => {
   fetchList()
 })
 
+/** 拉取第一页浏览历史（重置页码 1） */
 const fetchList = async () => {
   loading.value = true
   try {
@@ -65,6 +77,7 @@ const fetchList = async () => {
   }
 }
 
+/** 加载下一页：追加到 list 末尾 */
 const loadMore = async () => {
   if (loadingMore.value) return
   loadingMore.value = true
@@ -80,11 +93,19 @@ const loadMore = async () => {
   }
 }
 
+/**
+ * 点击某条历史：跳转到对应新闻详情
+ * @param item - 历史记录项
+ */
 const handleClick = (item) => {
   const newsId = item.newsId || item.id
   router.push(`/news/${newsId}`)
 }
 
+/**
+ * 删除单条浏览历史：调接口成功后从本地列表移除
+ * @param historyId - 历史记录 ID
+ */
 const handleDelete = async (historyId) => {
   try {
     await deleteHistory(historyId)
@@ -95,6 +116,7 @@ const handleDelete = async (historyId) => {
   }
 }
 
+/** 清空所有浏览历史：二次确认后调接口并清空本地列表 */
 const handleClear = async () => {
   try {
     await ElMessageBox.confirm('确定要清空所有浏览历史吗？', '提示', {

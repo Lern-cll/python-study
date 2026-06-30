@@ -1,15 +1,18 @@
 <template>
   <div class="login-page">
+    <!-- 顶部：返回箭头 -->
     <div class="header">
       <el-icon @click="router.back()"><ArrowLeft /></el-icon>
     </div>
     <div class="form-container">
+      <!-- 品牌区：Logo + 应用名 -->
       <div class="brand">
         <div class="avatar">
           <img :src="defaultAvatar" alt="avatar" />
         </div>
         <h1 class="title">新闻资讯</h1>
       </div>
+      <!-- 登录表单：用户名 / 密码 -->
       <el-form ref="formRef" :model="form" :rules="rules">
         <el-form-item prop="username">
           <el-input
@@ -35,10 +38,12 @@
           </BaseButton>
         </el-form-item>
       </el-form>
+      <!-- 测试账号提示 -->
       <div class="test-account">
         <p>测试账号：admin</p>
         <p>测试密码：123456</p>
       </div>
+      <!-- 底部：跳转注册 -->
       <div class="footer">
         <span>还没有账号？</span>
         <span class="link" @click="router.push('/register')">立即注册</span>
@@ -59,18 +64,26 @@ import defaultAvatar from '@/assets/imgs/photo.jpeg'
 const router = useRouter()
 const userStore = useUserStore()
 
+// 表单实例引用（用于调用 validate 进行校验）
 const formRef = ref(null)
+// 提交按钮的 loading 状态
 const loading = ref(false)
+// 表单数据：用户名、密码
 const form = reactive({
   username: '',
   password: ''
 })
 
+// 表单字段校验规则
 const rules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
+/**
+ * 提交登录：先校验表单 → 调 userStore.login → 成功后跳 redirect 或首页
+ * redirect 来源：路由守卫在拦截未登录访问时写入 query.redirect
+ */
 const handleLogin = async () => {
   try {
     await formRef.value.validate()
@@ -80,6 +93,7 @@ const handleLogin = async () => {
     const redirect = router.currentRoute.value.query.redirect || '/home'
     router.replace(redirect)
   } catch (e) {
+    // el-form 校验失败回调 reject(false)，不弹错误
     if (e !== false) {
       ElMessage.error('登录失败')
     }

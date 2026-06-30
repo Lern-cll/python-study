@@ -1,5 +1,6 @@
 <template>
   <div class="news-detail-page">
+    <!-- 顶部：返回 + 标题 -->
     <div class="header">
       <el-icon class="back-icon" @click="router.back()"><ArrowLeft /></el-icon>
       <span class="title">新闻详情</span>
@@ -31,7 +32,7 @@
           </span>
         </div>
 
-        <!-- 封面图 -->
+        <!-- 封面图：默认 16:9 占位，加载完成后按真实比例展示 -->
         <div class="cover" v-if="news.image">
           <div class="cover-inner" :style="coverAspect">
             <img
@@ -44,7 +45,7 @@
           </div>
         </div>
 
-        <!-- 新闻内容 -->
+        <!-- 新闻正文（HTML 字符串，直接由后端渲染） -->
         <div class="article" v-html="news.content"></div>
 
         <!-- 相关推荐 -->
@@ -87,13 +88,21 @@ const route = useRoute()
 const router = useRouter()
 const newsStore = useNewsStore()
 
+// 当前展示的新闻详情
 const news = ref(null)
+// 详情加载中标记
 const loading = ref(false)
+// 当前新闻是否已被当前用户收藏
 const isFavorited = ref(false)
 // 封面图容器默认占位宽高比，避免图片加载过程中挤压下方内容
 const coverAspect = ref({ aspectRatio: '16 / 9' })
+// 封面图是否加载完成（用于淡入显示）
 const coverLoaded = ref(false)
 
+/**
+ * 封面图加载完成：按图片真实宽高比调整容器，避免拉伸
+ * @param e - img 元素的 load 事件
+ */
 const onCoverLoad = (e) => {
   const img = e.target
   if (img.naturalWidth && img.naturalHeight) {
@@ -104,16 +113,21 @@ const onCoverLoad = (e) => {
   coverLoaded.value = true
 }
 
+/** 封面图加载失败：保持默认占位，不再继续闪烁 */
 const onCoverError = () => {
   // 加载失败时保持默认占位，不再继续闪烁
   coverLoaded.value = true
 }
 
+/** 进入页面：拉取详情 + 自动添加浏览记录 */
 onMounted(async () => {
   await fetchDetail()
   await addViewHistory()
 })
 
+/**
+ * 拉取新闻详情并同步收藏状态
+ */
 const fetchDetail = async () => {
   loading.value = true
   coverLoaded.value = false
@@ -129,6 +143,7 @@ const fetchDetail = async () => {
   }
 }
 
+/** 拉取当前新闻的收藏状态以同步图标 */
 const checkFavoriteStatus = async () => {
   try {
     const res = await checkFavorite(route.params.id)
@@ -139,6 +154,7 @@ const checkFavoriteStatus = async () => {
   }
 }
 
+/** 添加浏览记录：失败仅打印日志，不影响详情页主流程 */
 const addViewHistory = async () => {
   try {
     await addHistory(route.params.id)
@@ -147,6 +163,7 @@ const addViewHistory = async () => {
   }
 }
 
+/** 切换收藏状态：已收藏则取消，未收藏则添加 */
 const handleToggleFavorite = async () => {
   const newsId = Number(route.params.id)
   try {
@@ -164,10 +181,19 @@ const handleToggleFavorite = async () => {
   }
 }
 
+/**
+ * 点击相关推荐：跳转到对应新闻详情
+ * @param id - 推荐新闻 ID
+ */
 const goRelated = (id) => {
   router.push(`/news/${id}`)
 }
 
+/**
+ * 将时间格式化为 YYYY-MM-DD HH:mm
+ * @param time - 时间字符串或时间戳
+ * @returns 格式化后的字符串，无效输入返回原值
+ */
 const formatDateTime = (time) => {
   if (!time) return ''
   const date = new Date(time)
@@ -176,6 +202,11 @@ const formatDateTime = (time) => {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
+/**
+ * 格式化阅读量，超过 1 万显示为「X.X万」
+ * @param views - 原始阅读量
+ * @returns 数字或带「万」单位的字符串
+ */
 const formatViews = (views) => {
   const n = Number(views) || 0
   if (n >= 10000) return `${(n / 10000).toFixed(1)}万`

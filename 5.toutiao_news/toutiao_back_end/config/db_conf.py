@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 
 # news_app 数据库连接字符串
+# 平台： MYSQL80   账号： root   密码： Lern@185
 # 注意：密码里的 @ 必须 URL 编码为 %40，否则 SQLAlchemy 解析 URL 时会出错
 ASYNC_DATABASE_URL = "mysql+aiomysql://root:Lern%40185@localhost:3306/news_app?charset=utf8mb4"
 

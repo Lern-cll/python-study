@@ -1,13 +1,17 @@
 <template>
   <div class="ai-chat-page">
+    <!-- 顶部标题 -->
     <div class="header">
       <h1 class="title">AI 问答助手</h1>
     </div>
+    <!-- 对话列表 -->
     <div class="chat-container" ref="chatContainer">
+      <!-- 空状态 -->
       <div v-if="messages.length === 0" class="empty-chat">
         <el-icon :size="48"><ChatDotSquare /></el-icon>
         <p>有什么问题可以问我哦~</p>
       </div>
+      <!-- 消息气泡列表：type=user 为右侧用户消息，type=ai 为左侧 AI 回复 -->
       <div
         v-for="(msg, index) in messages"
         :key="index"
@@ -22,6 +26,7 @@
           <div class="message-bubble">{{ msg.content }}</div>
         </div>
       </div>
+      <!-- AI 思考中气泡 -->
       <div v-if="isTyping" class="message ai">
         <div class="message-avatar">
           <el-icon :size="24"><MagicStick /></el-icon>
@@ -34,6 +39,7 @@
         </div>
       </div>
     </div>
+    <!-- 输入区：多行输入 + 发送按钮 -->
     <div class="input-area">
       <el-input
         v-model="inputText"
@@ -55,12 +61,20 @@ import { ref, nextTick } from 'vue'
 import { ChatDotSquare, User, MagicStick, Loading } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
+// 聊天消息列表：{ type: 'user' | 'ai', content: string }
 const messages = ref([])
+// 输入框绑定值
 const inputText = ref('')
+// AI 是否正在「思考」（用于显示加载气泡 + 禁用发送按钮）
 const isTyping = ref(false)
+// 对话列表容器 DOM（用于滚到底部）
 const chatContainer = ref(null)
 
-// 模拟AI回复
+/**
+ * 模拟 AI 回复（前端随机选择一条固定话术，未对接真实 AI 接口）
+ * @param question - 用户问题（未使用，预留扩展）
+ * @returns 模拟回复文本
+ */
 const mockAIResponse = (question) => {
   const responses = [
     '这是一个很好的问题！根据我的分析，这涉及到多个方面的考量。',
@@ -72,6 +86,10 @@ const mockAIResponse = (question) => {
   return responses[Math.floor(Math.random() * responses.length)]
 }
 
+/**
+ * 发送消息：追加用户消息 → 显示思考气泡 → 模拟思考延时 → 追加 AI 回复 → 滚到底部
+ * 空内容直接 return；输入框失去焦点（提交后）由 nextTick 后清空
+ */
 const handleSend = async () => {
   const text = inputText.value.trim()
   if (!text) return
@@ -102,6 +120,7 @@ const handleSend = async () => {
   scrollToBottom()
 }
 
+/** 把对话列表滚到最底部，便于看到最新消息 */
 const scrollToBottom = () => {
   if (chatContainer.value) {
     chatContainer.value.scrollTop = chatContainer.value.scrollHeight

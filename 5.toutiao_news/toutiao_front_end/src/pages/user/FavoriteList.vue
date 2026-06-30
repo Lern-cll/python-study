@@ -1,5 +1,6 @@
 <template>
   <div class="favorite-list-page">
+    <!-- 顶部：返回 + 标题 + 清空按钮（仅在有数据时显示） -->
     <div class="header">
       <el-icon @click="router.back()"><ArrowLeft /></el-icon>
       <span>我的收藏</span>
@@ -8,16 +9,19 @@
       </el-button>
     </div>
     <div class="content" v-loading="loading">
+      <!-- 收藏列表：每条点击进入详情 -->
       <NewsItem
         v-for="item in list"
         :key="item.id"
         :news="item.news || item"
         @click="handleClick(item)"
       />
+      <!-- 空状态 -->
       <div v-if="!loading && list.length === 0" class="empty-state">
         <el-icon :size="48"><Star /></el-icon>
         <p>暂无收藏内容</p>
       </div>
+      <!-- 加载更多 -->
       <div v-if="hasMore" class="load-more" @click="loadMore">
         <span v-if="loadingMore">加载中...</span>
         <span v-else>加载更多</span>
@@ -36,17 +40,25 @@ import NewsItem from '@/components/NewsItem.vue'
 
 const router = useRouter()
 
+// 首次加载列表的 loading
 const loading = ref(false)
+// 加载更多时的 loading
 const loadingMore = ref(false)
+// 收藏列表数据
 const list = ref([])
+// 当前页码（分页）
 const page = ref(1)
+// 每页条数
 const pageSize = ref(10)
+// 是否还有更多（注意：当前实现里首次判断条件为「已加载 >= 总数」时不再加载更多，与常见写法相反）
 const hasMore = ref(false)
 
+/** 进入页面：拉取第一页收藏列表 */
 onMounted(() => {
   fetchList()
 })
 
+/** 拉取第一页收藏列表（重置页码 1） */
 const fetchList = async () => {
   loading.value = true
   try {
@@ -60,6 +72,7 @@ const fetchList = async () => {
   }
 }
 
+/** 加载下一页：追加到 list 末尾 */
 const loadMore = async () => {
   if (loadingMore.value) return
   loadingMore.value = true
@@ -75,11 +88,16 @@ const loadMore = async () => {
   }
 }
 
+/**
+ * 点击某条收藏：跳转到对应新闻详情
+ * @param item - 收藏记录项
+ */
 const handleClick = (item) => {
   const newsId = item.newsId || item.id
   router.push(`/news/${newsId}`)
 }
 
+/** 清空所有收藏：二次确认后调用接口并清空本地列表 */
 const handleClear = async () => {
   try {
     await ElMessageBox.confirm('确定要清空所有收藏吗？', '提示', {

@@ -33,6 +33,7 @@ import { useRouter } from 'vue-router'
 import { View, Loading } from '@element-plus/icons-vue'
 
 const props = defineProps({
+  // 单条新闻数据（必传）
   news: {
     type: Object,
     required: true
@@ -40,20 +41,29 @@ const props = defineProps({
 })
 
 const router = useRouter()
+// 缩略图是否已加载完成（用于占位图与图片的切换）
 const imageLoaded = ref(false)
 
+/** 图片加载成功：隐藏占位图、显示真实图 */
 const onImageLoad = () => {
   imageLoaded.value = true
 }
 
+/** 图片加载失败：同样隐藏占位图，避免无限 loading */
 const onImageError = () => {
   imageLoaded.value = true
 }
 
+/** 点击新闻条目：跳转至详情页 */
 const handleClick = () => {
   router.push(`/news/${props.news.id}`)
 }
 
+/**
+ * 将时间格式化为「刚刚 / N分钟前 / N小时前 / N天前 / 日期」
+ * @param time - 时间字符串或时间戳
+ * @returns 友好时间文案
+ */
 const formatTime = (time) => {
   if (!time) return ''
   const date = new Date(time)
@@ -70,6 +80,11 @@ const formatTime = (time) => {
   return date.toLocaleDateString()
 }
 
+/**
+ * 格式化阅读量，超过 1 万显示为「X.X万」
+ * @param views - 原始阅读量
+ * @returns 数字或带「万」单位的字符串
+ */
 const formatViews = (views) => {
   const n = Number(views) || 0
   if (n >= 10000) return `${(n / 10000).toFixed(1)}万`

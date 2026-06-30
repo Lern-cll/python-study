@@ -1,5 +1,6 @@
 /**
  * 用户状态管理
+ * 负责：登录、注册、用户信息拉取/更新、修改密码、退出登录
  */
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
@@ -18,6 +19,8 @@ import { setToken, setUserInfo, clearAuth, getUserInfo } from '@/utils/auth'
  *  - /user/login    → token 为字符串
  *  - /user/register → token 为对象 { id, user_id, token, expires_at, created_at }
  * 这里统一从两种形态中取出真正的 token 字符串。
+ * @param raw - 接口返回的 token 字段
+ * @returns token 字符串，无法解析时返回空串
  */
 const extractToken = (raw: unknown): string => {
   if (typeof raw === 'string') return raw
@@ -28,11 +31,16 @@ const extractToken = (raw: unknown): string => {
 }
 
 export const useUserStore = defineStore('user', () => {
-  // 状态
+  // ============ 状态 ============
+  // 当前登录用户信息（null 表示未登录）
   const userInfo = ref<UserInfo | null>(null)
+  // 是否已登录（与 userInfo 联动，供模板直接读取）
   const isLoggedIn = ref(false)
 
-  // 初始化用户信息
+  // ============ 内部方法 ============
+  /**
+   * 从本地缓存恢复用户信息，用于刷新页面或首次加载时保持登录态
+   */
   const initUserInfo = () => {
     const cachedInfo = getUserInfo()
     if (cachedInfo) {
@@ -41,7 +49,12 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // 登录：res 为 { code, message, data: { token, userInfo } }，data.token 为字符串
+  // ============ Action ============
+  /**
+   * 登录：调用登录接口，提取 token 写入 localStorage，并缓存用户信息
+   * @param data - 用户名与密码
+   * @returns 原始接口响应
+   */
   const login = async (data: { username: string; password: string }) => {
     const res = await loginApi(data)
     const payload = res?.data ?? {}
@@ -55,7 +68,11 @@ export const useUserStore = defineStore('user', () => {
     return res
   }
 
-  // 注册：与登录保持一致；data.token 实际是对象 { id, user_id, token, expires_at, created_at }
+  /**
+   * 注册：与登录保持一致；data.token 实际是对象 { id, user_id, token, expires_at, created_at }
+   * @param data - 用户名与密码
+   * @returns 原始接口响应
+   */
   const register = async (data: { username: string; password: string }) => {
     const res = await registerApi(data)
     const payload = res?.data ?? {}
@@ -68,7 +85,9 @@ export const useUserStore = defineStore('user', () => {
     return res
   }
 
-  // 获取用户信息
+  /**
+   * 拉取最新用户信息并同步到本地缓存（应用启动或登录后刷新使用）
+   */
   const fetchUserInfo = async () => {
     try {
       const res = await getUserInfoApi()
@@ -84,7 +103,11 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // 更新用户信息
+  /**
+   * 更新用户信息（昵称、头像、简介等），成功后本地缓存同步覆盖
+   * @param data - 要更新的字段
+   * @returns 原始接口响应
+   */
   const updateUserInfo = async (data: Partial<UserInfo>) => {
     const res = await updateUserInfoApi(data)
     if (userInfo.value) {
@@ -94,19 +117,25 @@ export const useUserStore = defineStore('user', () => {
     return res
   }
 
-  // 修改密码
+  /**
+   * 修改密码
+   * @param data - 旧密码与新密码
+   * @returns 原始接口响应
+   */
   const changePassword = async (data: { oldPassword: string; newPassword: string }) => {
     return await updatePasswordApi(data)
   }
 
-  // 退出登录
+  /**
+   * 退出登录：清空本地凭证与 store 状态，不发起接口请求
+   */
   const logout = () => {
     clearAuth()
     userInfo.value = null
     isLoggedIn.value = false
   }
 
-  // 初始化
+  // 初始化：从 localStorage 恢复登录态
   initUserInfo()
 
   return {

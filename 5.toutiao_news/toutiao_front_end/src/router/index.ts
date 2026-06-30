@@ -12,6 +12,11 @@ import HistoryList from '@/pages/user/HistoryList.vue'
 import { getToken, isTokenExpired } from '@/utils/auth'
 import { ElMessage } from 'element-plus'
 
+// 路由表：
+// - meta.title       浏览器标题
+// - meta.requiresAuth 需要登录后才能访问
+// - meta.keepAlive   是否被 MainLayout 的 keep-alive 缓存
+// - meta.hideTabBar  是否隐藏底部 TabBar（详情页等）
 const routes: RouteRecordRaw[] = [
   {
     path: '/login',
@@ -81,7 +86,9 @@ const router = createRouter({
   routes
 })
 
-// 路由守卫
+// 全局前置守卫：
+// 1) 每次跳转都更新 document.title
+// 2) 需要登录的页面：未登录或 Token 过期则跳登录，并带上 redirect 参数便于登录后回跳
 router.beforeEach((to, from, next) => {
   document.title = to.meta.title ? `${to.meta.title} - 头条App` : '头条App'
 

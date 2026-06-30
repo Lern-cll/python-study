@@ -1,6 +1,8 @@
 <template>
   <div class="main-layout">
     <div class="main-content">
+      <!-- router-view + transition + keep-alive 组合：
+           transition 提供路由切换动画，keep-alive 缓存标记 keepAlive 的子路由 -->
       <router-view v-slot="{ Component, route }">
         <transition name="slide" mode="out-in">
           <keep-alive :include="cachedViews">
@@ -9,6 +11,7 @@
         </transition>
       </router-view>
     </div>
+    <!-- 详情页等通过路由 meta.hideTabBar 隐藏底部 TabBar -->
     <div v-if="!hideTabBar" class="main-tabbar">
       <div
         v-for="tab in tabs"
@@ -33,15 +36,17 @@ import { HomeFilled, ChatDotRound, User } from '@element-plus/icons-vue'
 const router = useRouter()
 const route = useRoute()
 
+// 底部 Tab 配置：path 为跳转地址，icon 为图标组件，requiresAuth 表示是否需要登录
 const tabs = [
   { path: '/home', label: '首页', icon: HomeFilled },
   { path: '/ai-chat', label: 'AI问答', icon: ChatDotRound },
   { path: '/mine', label: '我的', icon: User, requiresAuth: true }
 ]
 
+// 当前路由路径（用于高亮当前 Tab）
 const currentPath = computed(() => route.path)
 
-// 需要被 keep-alive 缓存的组件名（取自路由的 name 字段）
+// 需要被 keep-alive 缓存的组件名（取自路由的 name 字段 + meta.keepAlive）
 const cachedViews = computed(() => {
   return router.getRoutes()
     .filter((r) => r.meta?.keepAlive && r.name)
@@ -51,6 +56,10 @@ const cachedViews = computed(() => {
 // 详情页等子路由通过 meta.hideTabBar 隐藏底部 TabBar
 const hideTabBar = computed(() => Boolean(route.meta?.hideTabBar))
 
+/**
+ * 点击底部 Tab：未登录且目标 Tab 需要登录则跳登录页，否则正常跳转
+ * @param tab - 被点击的 Tab 配置对象
+ */
 const handleTabClick = (tab) => {
   if (tab.requiresAuth && !localStorage.getItem('toutiao_token')) {
     router.push('/login')

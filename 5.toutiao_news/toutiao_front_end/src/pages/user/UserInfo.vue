@@ -1,10 +1,12 @@
 <template>
   <div class="user-info-page">
+    <!-- 顶部：返回 + 标题 -->
     <div class="header">
       <el-icon @click="router.back()"><ArrowLeft /></el-icon>
       <span>个人信息</span>
     </div>
 
+    <!-- 基础信息列表 -->
     <div class="list-section">
       <div class="list-item" @click="showAvatarPicker = true">
         <span class="label">头像</span>
@@ -30,6 +32,7 @@
       </div>
     </div>
 
+    <!-- 安全设置：修改密码 -->
     <div class="list-section">
       <div class="list-item" @click="showPasswordDialog = true">
         <span class="label">修改密码</span>
@@ -39,7 +42,7 @@
       </div>
     </div>
 
-    <!-- 昵称编辑弹窗 -->
+    <!-- 简介编辑弹窗 -->
     <el-dialog v-model="showNicknameEdit" title="编辑个人简介" width="300px">
       <el-input v-model="tempBio" placeholder="请输入个人简介" />
       <template #footer>
@@ -77,15 +80,23 @@ import defaultAvatar from '@/assets/imgs/photo.jpeg'
 const router = useRouter()
 const userStore = useUserStore()
 
+// 当前登录用户信息（来自 store）
 const userInfo = computed(() => userStore.userInfo)
 
+// 修改简介时的 loading
 const saving = ref(false)
+// 修改密码时的 loading
 const passwordSaving = ref(false)
+// 简介编辑弹窗显隐
 const showNicknameEdit = ref(false)
+// 修改密码弹窗显隐
 const showPasswordDialog = ref(false)
+// 头像选择弹窗显隐（暂未实现选择器，预留）
 const showAvatarPicker = ref(false)
+// 简介输入框临时值
 const tempBio = ref('')
 
+// 用户可编辑的表单数据
 const form = reactive({
   id: '',
   username: '',
@@ -96,11 +107,13 @@ const form = reactive({
   bio: ''
 })
 
+// 修改密码表单
 const passwordForm = reactive({
   oldPassword: '',
   newPassword: ''
 })
 
+/** 进入页面：把 store 中的用户信息同步到本地表单 */
 onMounted(() => {
   if (userStore.userInfo) {
     Object.assign(form, userStore.userInfo)
@@ -108,6 +121,7 @@ onMounted(() => {
   }
 })
 
+/** 保存个人简介：调接口更新，成功后关闭弹窗 */
 const saveBio = async () => {
   form.bio = tempBio.value
   try {
@@ -122,6 +136,7 @@ const saveBio = async () => {
   }
 }
 
+/** 提交修改密码：必填校验 → 调接口 → 清空表单并关闭弹窗 */
 const handleChangePassword = async () => {
   if (!passwordForm.oldPassword || !passwordForm.newPassword) {
     ElMessage.warning('请填写完整信息')

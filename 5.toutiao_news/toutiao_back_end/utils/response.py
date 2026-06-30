@@ -7,10 +7,14 @@ from fastapi.responses import JSONResponse
 # SQLAlchemy ORM 对象（数据库查询结果）
 # datetime 对象（如 datetime.now()）
 from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel
 
-#
+
 def success_response(message: str = 'success', data=None):
-    # 目标：将任何的 FastApi, Pydantic, ORM对象，都要正常响应： code、message、data
+    # 如果是 Pydantic 模型，使用 by_alias=True 序列化以输出别名字段名
+    if isinstance(data, BaseModel):
+        data = data.model_dump(by_alias=True)
+
     content = {
         "code": 200,
         "message": message,

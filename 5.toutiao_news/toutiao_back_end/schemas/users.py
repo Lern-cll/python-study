@@ -30,12 +30,13 @@ class UserInfoResponse(UserInfoBase):
 # 用户认证信息
 class UserAuthResponse(BaseModel):
     token: str
-    user_info: UserInfoResponse = Field(..., aliases="userInfo")
+    user_info: UserInfoResponse = Field(..., alias="userInfo", serialization_alias="userInfo")
 
     # 模型类配置
     model_config = ConfigDict(
         populate_by_name=True,   # 允许同时使用字段原名（user_info）和别名（userInfo）来传值
         # extra="forbid",   # 禁止传入模型中未定义的字段，多余字段会直接报错
-        arbitrary_types_allowed=True,   # 允许字段使用任意类型的对象（非标准JSON类型）
+        # arbitrary_types_allowed=True,   # 允许字段使用任意类型的对象（非标准JSON类型）
         from_attributes=True  # 允许从ORM对象属性中获取字段值
     )
+

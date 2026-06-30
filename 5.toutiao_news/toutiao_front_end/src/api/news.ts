@@ -3,15 +3,20 @@
  */
 import request from '@/utils/request'
 
-// 请求参数类型
+// ============ 请求参数类型 ============
+/** 新闻列表分页与筛选参数 */
 interface NewsListParams {
+  /** 当前页码 */
   page?: number
+  /** 每页条数 */
   pageSize?: number
+  /** 分类ID；null/不传 表示全部分类 */
   categoryId?: number | null
 }
 
 /**
- * 获取新闻分类列表
+ * 获取新闻分类列表（首页顶部 Tab 数据源）
+ * @returns 分类列表的接口响应
  */
 export function getCategories(): Promise<ApiResponse<CategoryItem[]>> {
   return request({
@@ -21,7 +26,9 @@ export function getCategories(): Promise<ApiResponse<CategoryItem[]>> {
 }
 
 /**
- * 获取新闻列表
+ * 获取新闻列表（分页）
+ * @param params - 分页参数与分类筛选
+ * @returns 新闻列表的接口响应
  */
 export function getNewsList(params: NewsListParams): Promise<ApiResponse<NewsItem[]>> {
   return request({
@@ -33,6 +40,8 @@ export function getNewsList(params: NewsListParams): Promise<ApiResponse<NewsIte
 
 /**
  * 获取新闻详情
+ * @param id - 新闻ID
+ * @returns 新闻详情的接口响应
  */
 export function getNewsDetail(id: number): Promise<ApiResponse<NewsItem>> {
   return request({
