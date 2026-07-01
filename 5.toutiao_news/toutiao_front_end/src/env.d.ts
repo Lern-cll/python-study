@@ -17,8 +17,12 @@ interface UserInfo {
   username?: string
   /** 昵称 */
   nickname?: string
-  /** 头像 URL */
-  avatar?: string
+  /** 头像 URL（后端可能返回 null） */
+  avatar?: string | null
+  /** 性别：unknown / male / female */
+  gender?: string
+  /** 个人简介 */
+  bio?: string
   /** 邮箱 */
   email?: string
   /** 手机号 */

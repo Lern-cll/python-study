@@ -102,8 +102,8 @@ export const useUserStore = defineStore('user', () => {
     try {
       const res = await getUserInfoApi()
       const payload = res?.data ?? {}
-      // 字段名统一为 userInfo；旧字段 user 留作兼容
-      userInfo.value = payload.userInfo ?? payload.user ?? null
+      // 接口直接返回用户信息对象（{ nickname, avatar, gender, bio, id, username }）
+      userInfo.value = payload ?? null
       if (userInfo.value) {
         setUserInfo(userInfo.value)
       }

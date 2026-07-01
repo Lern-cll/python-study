@@ -21,6 +21,8 @@ interface UpdateUserData {
   nickname?: string
   /** 头像 URL */
   avatar?: string
+  /** 个人简介 */
+  bio?: string
   /** 邮箱 */
   email?: string
   /** 手机号 */
@@ -63,10 +65,10 @@ export function login(data: LoginData): Promise<ApiResponse> {
 
 /**
  * 获取用户信息
- * 后端返回 data: { userInfo: UserInfo, ... }
- * @returns 接口响应，data 中 userInfo 或 user 为用户信息
+ * 后端直接返回用户信息对象作为 data
+ * @returns 接口响应，data 即为用户信息
  */
-export function getUserInfo(): Promise<ApiResponse<{ userInfo?: UserInfo; user?: UserInfo }>> {
+export function getUserInfo(): Promise<ApiResponse<UserInfo>> {
   return request({
     url: '/user/info',
     method: 'get'
