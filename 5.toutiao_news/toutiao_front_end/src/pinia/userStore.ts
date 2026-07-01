@@ -11,7 +11,7 @@ import {
   updateUserInfo as updateUserInfoApi,
   updatePassword as updatePasswordApi
 } from '@/api/user'
-import { setToken, setUserInfo, clearAuth, getUserInfo } from '@/utils/auth'
+import { setToken, setUserInfo, clearAuth, getUserInfo, getToken } from '@/utils/auth'
 
 /**
  * 提取 token 字符串。
@@ -36,6 +36,8 @@ export const useUserStore = defineStore('user', () => {
   const userInfo = ref<UserInfo | null>(null)
   // 是否已登录（与 userInfo 联动，供模板直接读取）
   const isLoggedIn = ref(false)
+  // 当前登录用户的 token（运行时态，与 localStorage 同步；供拦截器读取）
+  const token = ref<string>('')
 
   // ============ 内部方法 ============
   /**
@@ -51,7 +53,7 @@ export const useUserStore = defineStore('user', () => {
 
   // ============ Action ============
   /**
-   * 登录：调用登录接口，提取 token 写入 localStorage，并缓存用户信息
+   * 登录：调用登录接口，提取 token 写入 Pinia 与 localStorage，并缓存用户信息
    * @param data - 用户名与密码
    * @returns 原始接口响应
    */
@@ -59,7 +61,11 @@ export const useUserStore = defineStore('user', () => {
     const res = await loginApi(data)
     const payload = res?.data ?? {}
     // 字段名以后端为准：后端返回 userInfo（非 user）
-    setToken(extractToken(payload.token))
+    const tk = extractToken(payload.token)
+    // 同步写入 Pinia（运行时态，供拦截器直接读取）
+    token.value = tk
+    // 同步写入 localStorage（持久化，刷新页面后仍能恢复登录态）
+    setToken(tk)
     userInfo.value = payload.userInfo ?? null
     if (userInfo.value) {
       setUserInfo(userInfo.value)
@@ -76,7 +82,11 @@ export const useUserStore = defineStore('user', () => {
   const register = async (data: { username: string; password: string }) => {
     const res = await registerApi(data)
     const payload = res?.data ?? {}
-    setToken(extractToken(payload.token))
+    const tk = extractToken(payload.token)
+    // 同步写入 Pinia（运行时态，供拦截器直接读取）
+    token.value = tk
+    // 同步写入 localStorage（持久化，刷新页面后仍能恢复登录态）
+    setToken(tk)
     userInfo.value = payload.userInfo ?? null
     if (userInfo.value) {
       setUserInfo(userInfo.value)
@@ -133,14 +143,27 @@ export const useUserStore = defineStore('user', () => {
     clearAuth()
     userInfo.value = null
     isLoggedIn.value = false
+    // 同步清空 Pinia 中的 token，避免退出后仍被拦截器误带
+    token.value = ''
+  }
+
+  /**
+   * 从 localStorage 恢复 token（与 userInfo 一起，在 initUserInfo 中调用）
+   * 保证刷新页面后拦截器依然能读到 token
+   */
+  const initToken = () => {
+    const cached = getToken()
+    if (cached) token.value = cached
   }
 
   // 初始化：从 localStorage 恢复登录态
   initUserInfo()
+  initToken()
 
   return {
     userInfo,
     isLoggedIn,
+    token,
     login,
     register,
     fetchUserInfo,

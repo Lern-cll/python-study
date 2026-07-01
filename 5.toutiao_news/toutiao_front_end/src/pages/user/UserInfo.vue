@@ -113,11 +113,18 @@ const passwordForm = reactive({
   newPassword: ''
 })
 
-/** 进入页面：把 store 中的用户信息同步到本地表单 */
-onMounted(() => {
-  if (userStore.userInfo) {
-    Object.assign(form, userStore.userInfo)
-    tempBio.value = form.bio || ''
+/** 进入页面：主动调 /user/info 拉取最新用户信息，失败时回退到 store 缓存 */
+onMounted(async () => {
+  try {
+    // 拉取最新数据；401 已在 axios 响应拦截器中处理（清 token + 跳登录）
+    await userStore.fetchUserInfo()
+  } catch (e) {
+    // 拉取失败：用 store 缓存兜底渲染
+  } finally {
+    if (userStore.userInfo) {
+      Object.assign(form, userStore.userInfo)
+      tempBio.value = form.bio || ''
+    }
   }
 })
 

@@ -68,13 +68,21 @@ const userInfo = computed(() => userStore.userInfo)
 const isLoggedIn = computed(() => userStore.isLoggedIn)
 
 /**
- * 点击用户信息卡：已登录跳个人设置页，未登录跳登录页
+ * 点击用户信息卡：
+ * - 未登录：跳登录页
+ * - 已登录：先调 /user/info 拉取最新用户信息（保证展示的是后端最新数据），
+ *          成功后再跳个人设置页；失败由响应拦截器统一处理（401 会清 token 并跳登录）
  */
-const handleUserInfo = () => {
-  if (isLoggedIn.value) {
-    router.push('/user-info')
-  } else {
+const handleUserInfo = async () => {
+  if (!isLoggedIn.value) {
     router.push('/login')
+    return
+  }
+  try {
+    await userStore.fetchUserInfo()
+    router.push('/user-info')
+  } catch (e) {
+    // 401 等异常已在 axios 响应拦截器中统一处理（弹错误并跳登录）
   }
 }
 

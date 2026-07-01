@@ -3,6 +3,16 @@ import { ElMessage } from 'element-plus'
 import { getToken, removeToken } from './auth'
 import router from '@/router'
 
+/**
+ * 请求白名单：命中下列路径的接口不需要携带 token（首页相关免登录）
+ * - /news/categories 首页分类导航
+ * - /news/list       首页新闻列表
+ * - /news/detail     新闻详情
+ * 注意：使用 includes 做模糊匹配，因 axios 内部已拼接 baseURL('/api')，
+ * 所以 url 形如 '/api/news/list'，直接用 '/news/list' 即可匹配
+ */
+const WHITELIST: string[] = ['/news/categories', '/news/list', '/news/detail']
+
 // 创建 Axios 实例：统一 baseURL、超时、请求头
 const service: AxiosInstance = axios.create({
   baseURL: '/api',
@@ -15,7 +25,13 @@ const service: AxiosInstance = axios.create({
 // 请求拦截器：每次请求自动从 localStorage 取出 Token 放入 Authorization 头
 service.interceptors.request.use(
   (config) => {
-    // 添加 Token
+    // 白名单内的请求直接放行，不加 token（首页可随意访问）
+    const url = config.url || ''
+    if (WHITELIST.some((path) => url.includes(path))) {
+      return config
+    }
+
+    // 非白名单请求：自动追加 Authorization 头
     const token = getToken()
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
