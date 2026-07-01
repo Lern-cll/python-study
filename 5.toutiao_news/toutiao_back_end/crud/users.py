@@ -55,3 +55,22 @@ async def authenticate_user(db: AsyncSession, username: str, password: str):
         return None
 
     return user
+
+
+# 根据Token 查询用户： 验证 Token -> 查询用户
+async def get_user_by_token(db: AsyncSession, token: str):
+
+    query = select(UserToken).where(UserToken.token == token)
+    result = await db.execute(query)
+    db_token = result.scalar_one_or_none()
+    #  如果token不存在，或者token已过期，返回 None
+    if not db_token or db_token.expires_at < datetime.now():
+        return None
+    # 通过userId 查询用户消息
+    query_user = select(User).where(User.id == db_token.user_id)
+    result_user = await db.execute(query_user)
+    user = result_user.scalar_one_or_none()
+    if not user:
+        return None
+    return user
+

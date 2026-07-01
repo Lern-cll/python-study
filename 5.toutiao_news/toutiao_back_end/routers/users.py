@@ -8,6 +8,7 @@ from config.db_conf import get_db
 from crud.users import get_user_by_name, create_user, create_token, authenticate_user
 from models.users import User
 from schemas.users import UserRequest, UserAuthResponse, UserInfoResponse
+from utils.auth import get_current_user
 from utils.response import success_response
 
 router = APIRouter(
@@ -64,9 +65,8 @@ async def login(
 
 
 # 通过用户名获取用户信息
+# 查token 查token -> 封装crud功能 ->  整合成一个工具函数路 -> 由导入使用:依赖注入
 @router.get("/info")
-async def user_info(username: str, db: AsyncSession = Depends(get_db)):
-    user = await get_user_by_name(db, username)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
+async def get_user_info(user: User = Depends(get_current_user)):
+    # 获取用户信息逻辑： 验证用户是否存在  -> 获取用户信息 -> 返回响应结果
+    return success_response(message="获取用户信息成功", data=UserInfoResponse.model_validate(user))

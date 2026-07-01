@@ -1,0 +1,15 @@
+{
+    "code": 200,
+    "message": "登录成功",
+    "data": {
+        "token": "37eb217d-1ee6-4709-bc4e-e96d9014b582",
+        "userInfo": {
+            "nickname": "测试用户",
+            "avatar": null,
+            "gender": "unknown",
+            "bio": "这是一个测试账号",
+            "id": 1,
+            "username": "admin"
+        }
+    }
+}
