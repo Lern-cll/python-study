@@ -8,7 +8,7 @@
         </div>
         <div class="info">
           <div class="nickname">{{ userInfo?.nickname || userInfo?.username || '未登录' }}</div>
-          <div class="desc">点击查看个人信息</div>
+          <div class="desc">{{ userInfo?.bio || '这个人很懒，什么都没写' }}</div>
         </div>
         <el-icon><ArrowRight /></el-icon>
       </div>

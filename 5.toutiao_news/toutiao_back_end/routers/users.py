@@ -5,9 +5,9 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from config.db_conf import get_db
-from crud.users import get_user_by_name, create_user, create_token, authenticate_user
+from crud.users import get_user_by_name, create_user, create_token, authenticate_user, update_user
 from models.users import User
-from schemas.users import UserRequest, UserAuthResponse, UserInfoResponse
+from schemas.users import UserRequest, UserAuthResponse, UserInfoResponse, UserUpdateRequest, UserChangePasswordRequest
 from utils.auth import get_current_user
 from utils.response import success_response
 
@@ -70,3 +70,36 @@ async def login(
 async def get_user_info(user: User = Depends(get_current_user)):
     # 获取用户信息逻辑： 验证用户是否存在  -> 获取用户信息 -> 返回响应结果
     return success_response(message="获取用户信息成功", data=UserInfoResponse.model_validate(user))
+
+
+# 修改用户信息
+@router.put("/update")
+async def update_user_info(
+        user_info: UserUpdateRequest,
+        user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db)
+):
+    # 修改用户信息逻辑： 验证用户是否存在  -> 修改用户信息（用户输入数据-put提交-请求体参数-pydantic模型类） -> 返回响应结果
+    exit_user = await get_user_by_name(db, user.username)
+    if exit_user and exit_user.id != user.id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="用户已存在")
+    user = await update_user(db, user.username, user_info)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="修改用户信息失败")
+    return success_response(message="修改用户信息成功", data=UserInfoResponse.model_validate(user))
+
+
+@router.put("/password")
+async def change_password(
+        password_data: UserChangePasswordRequest,
+        user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db)
+):
+    # 修改用户密码逻辑： 验证用户是否存在  -> 修改用户密码（用户输入数据-put提交-请求体参数-pydantic模型类） -> 返回响应结果
+    exit_user = await get_user_by_name(db, user.username)
+    if not exit_user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="用户不存在")
+    user = await update_user(db, user.username, password_data)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="修改用户密码失败")
+    return success_response(message="修改用户密码成功")

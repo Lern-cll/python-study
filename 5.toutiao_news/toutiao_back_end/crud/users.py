@@ -1,11 +1,12 @@
 import uuid
 from datetime import datetime, timedelta
+from fastapi import HTTPException
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.users import User, UserToken
-from schemas.users import UserRequest
+from schemas.users import UserRequest, UserUpdateRequest
 from utils.security import get_password_hash, verify_password
 
 
@@ -75,3 +76,36 @@ async def get_user_by_token(db: AsyncSession, token: str):
         return None
     return user
 
+
+# 修改用户信息
+async def update_user(db: AsyncSession, username: str, update_data: UserUpdateRequest):
+    user = await get_user_by_name(db, username)
+    if not user:
+        return None
+
+    #update(User).where(User.username == username).values(字段=值，字段=值)
+    # update_data本身是pydantic类型，得到字典 -> **解包
+    # exclude_unset: 是否排除未设置的字段
+    query = update(User).where(User.username == username).values(**update_data.model_dump(exclude_unset=True, exclude_none=True))
+    result = await db.execute(query)
+    await db.commit()  # 提交更改
+
+    if result.rowcount == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    updated_user = await get_user_by_name(db, username)
+    return updated_user
+
+# 修改用户密码:  验证用户存在-验证老密码-修改密码
+async def update_user_password(db: AsyncSession, username: str, password_data: UserUpdateRequest):
+    user = await get_user_by_name(db, username)
+    if not user:
+        return None
+    #
+    if not verify_password(password_data.password, user.password):
+        return None
+    user.password = get_password_hash(password_data.password)
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user

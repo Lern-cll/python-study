@@ -19,11 +19,22 @@
         <span class="label">用户名</span>
         <span class="value">{{ form.username || userInfo?.username || '-' }}</span>
       </div>
+      <div class="list-item" @click="openNicknameEdit">
+        <span class="label">昵称</span>
+        <span class="value editable">
+          {{ form.nickname || '测试用户' }}
+          <el-icon><ArrowRight /></el-icon>
+        </span>
+      </div>
+      <div class="list-item">
+        <span class="label">性别</span>
+        <span class="value">{{ genderLabel }}</span>
+      </div>
       <div class="list-item">
         <span class="label">账号ID</span>
         <span class="value id-value">ID: {{ form.id || userInfo?.id || '-' }}</span>
       </div>
-      <div class="list-item" @click="showNicknameEdit = true">
+      <div class="list-item" @click="showBioEdit = true">
         <span class="label">个人简介</span>
         <span class="value editable">
           {{ form.bio || '这个人很懒，什么都没写' }}
@@ -42,11 +53,20 @@
       </div>
     </div>
 
-    <!-- 简介编辑弹窗 -->
-    <el-dialog v-model="showNicknameEdit" title="编辑个人简介" width="300px">
-      <el-input v-model="tempBio" placeholder="请输入个人简介" />
+    <!-- 昵称编辑弹窗 -->
+    <el-dialog v-model="showNicknameEdit" title="编辑昵称" width="300px">
+      <el-input v-model="tempNickname" placeholder="请输入昵称" />
       <template #footer>
         <el-button @click="showNicknameEdit = false">取消</el-button>
+        <el-button type="primary" @click="saveNickname">确定</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 简介编辑弹窗 -->
+    <el-dialog v-model="showBioEdit" title="编辑个人简介" width="300px">
+      <el-input v-model="tempBio" placeholder="请输入个人简介" />
+      <template #footer>
+        <el-button @click="showBioEdit = false">取消</el-button>
         <el-button type="primary" @click="saveBio">确定</el-button>
       </template>
     </el-dialog>
@@ -59,6 +79,9 @@
         </el-form-item>
         <el-form-item label="新密码">
           <el-input v-model="passwordForm.newPassword" type="password" placeholder="请输入新密码" show-password />
+        </el-form-item>
+        <el-form-item label="确认新密码">
+          <el-input v-model="passwordForm.confirmPassword" type="password" placeholder="请再次输入新密码" show-password />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -83,18 +106,30 @@ const userStore = useUserStore()
 // 当前登录用户信息（来自 store）
 const userInfo = computed(() => userStore.userInfo)
 
-// 修改简介时的 loading
+// 修改昵称时的 loading
 const saving = ref(false)
 // 修改密码时的 loading
 const passwordSaving = ref(false)
-// 简介编辑弹窗显隐
+// 昵称编辑弹窗显隐
 const showNicknameEdit = ref(false)
+// 简介编辑弹窗显隐
+const showBioEdit = ref(false)
 // 修改密码弹窗显隐
 const showPasswordDialog = ref(false)
 // 头像选择弹窗显隐（暂未实现选择器，预留）
 const showAvatarPicker = ref(false)
+// 昵称输入框临时值
+const tempNickname = ref('')
 // 简介输入框临时值
 const tempBio = ref('')
+
+// 性别展示文案：兼容 unknown / male / female
+const genderLabel = computed(() => {
+  const g = userStore.userInfo?.gender
+  if (g === 'male') return '男'
+  if (g === 'female') return '女'
+  return 'unknown'
+})
 
 // 用户可编辑的表单数据
 const form = reactive({
@@ -110,7 +145,8 @@ const form = reactive({
 // 修改密码表单
 const passwordForm = reactive({
   oldPassword: '',
-  newPassword: ''
+  newPassword: '',
+  confirmPassword: ''
 })
 
 /** 进入页面：主动调 /user/info 拉取最新用户信息，失败时回退到 store 缓存 */
@@ -124,9 +160,36 @@ onMounted(async () => {
     if (userStore.userInfo) {
       Object.assign(form, userStore.userInfo)
       tempBio.value = form.bio || ''
+      tempNickname.value = form.nickname || '测试用户'
     }
   }
 })
+
+/** 打开昵称弹窗时，把当前昵称同步到临时变量 */
+const openNicknameEdit = () => {
+  tempNickname.value = form.nickname || '测试用户'
+  showNicknameEdit.value = true
+}
+
+/** 保存昵称：调接口更新，成功后关闭弹窗 */
+const saveNickname = async () => {
+  const next = tempNickname.value.trim()
+  if (!next) {
+    ElMessage.warning('昵称不能为空')
+    return
+  }
+  form.nickname = next
+  try {
+    saving.value = true
+    await userStore.updateUserInfo({ nickname: form.nickname })
+    ElMessage.success('修改成功')
+  } catch (e) {
+    ElMessage.error('修改失败')
+  } finally {
+    saving.value = false
+    showNicknameEdit.value = false
+  }
+}
 
 /** 保存个人简介：调接口更新，成功后关闭弹窗 */
 const saveBio = async () => {
@@ -139,22 +202,32 @@ const saveBio = async () => {
     ElMessage.error('修改失败')
   } finally {
     saving.value = false
-    showNicknameEdit.value = false
+    showBioEdit.value = false
   }
 }
 
-/** 提交修改密码：必填校验 → 调接口 → 清空表单并关闭弹窗 */
+/** 提交修改密码：必填校验 → 两次新密码一致性 → 新旧密码差异校验 → 调接口 → 清空表单并关闭弹窗 */
 const handleChangePassword = async () => {
-  if (!passwordForm.oldPassword || !passwordForm.newPassword) {
+  const { oldPassword, newPassword, confirmPassword } = passwordForm
+  if (!oldPassword || !newPassword || !confirmPassword) {
     ElMessage.warning('请填写完整信息')
+    return
+  }
+  if (newPassword !== confirmPassword) {
+    ElMessage.warning('两次输入的新密码不一致')
+    return
+  }
+  if (newPassword === oldPassword) {
+    ElMessage.warning('新密码不能与旧密码相同')
     return
   }
   try {
     passwordSaving.value = true
-    await userStore.changePassword(passwordForm)
+    await userStore.changePassword({ oldPassword, newPassword })
     ElMessage.success('密码修改成功')
     passwordForm.oldPassword = ''
     passwordForm.newPassword = ''
+    passwordForm.confirmPassword = ''
     showPasswordDialog.value = false
   } catch (e) {
     ElMessage.error('密码修改失败')
