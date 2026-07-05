@@ -1,4 +1,4 @@
-from http.client import HTTPException
+from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from utils.exception import http_exception_handler, sqlalchemy_error_handler, general_exception_handler, \

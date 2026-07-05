@@ -1,25 +1,12 @@
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime
 from typing import Optional
 from sqlalchemy import Integer, DateTime, String, Text, ForeignKey, Index
-
-# 基础模型
-class Base(DeclarativeBase):
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=datetime.now,
-        comment="创建时间",
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=datetime.now,
-        onupdate=datetime.now,
-        comment="更新时间",
-    )
+from models.base import Base, TimestampMixin
 
 
 # 新闻分类
-class Category(Base):
+class Category(TimestampMixin, Base):
     __tablename__ = "news_category"
     # 分类ID  Integer：整形；
     #  primary_key：主键；
@@ -37,7 +24,7 @@ class Category(Base):
 
 
 # 新闻
-class News(Base):
+class News(TimestampMixin, Base):
     __tablename__ = "news"
 
     # 创建索引: 提升查询速度

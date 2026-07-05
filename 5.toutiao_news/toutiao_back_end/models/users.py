@@ -1,12 +1,8 @@
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime
 from typing import Optional
 from sqlalchemy import Integer, DateTime, String, Enum, Index
-
-
-# 基础模型
-class Base(DeclarativeBase):
-    pass
+from models.base import Base
 
 
 # 用户信息表
