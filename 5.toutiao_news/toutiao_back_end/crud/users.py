@@ -6,7 +6,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.users import User, UserToken
-from schemas.users import UserRequest, UserUpdateRequest
+from schemas.users import UserRequest, UserUpdateRequest, UserChangePasswordRequest
 from utils.security import get_password_hash, verify_password
 
 
@@ -97,15 +97,14 @@ async def update_user(db: AsyncSession, username: str, update_data: UserUpdateRe
     return updated_user
 
 # 修改用户密码:  验证用户存在-验证老密码-修改密码
-async def update_user_password(db: AsyncSession, username: str, password_data: UserUpdateRequest):
-    user = await get_user_by_name(db, username)
-    if not user:
-        return None
-    #
-    if not verify_password(password_data.password, user.password):
-        return None
-    user.password = get_password_hash(password_data.password)
+async def update_user_password(db: AsyncSession, user, password_data: UserChangePasswordRequest):
+
+    if not verify_password(password_data.old_password, user.password):
+        return False
+    user.password = get_password_hash(password_data.new_password)
+    # 更新: 由SQLAlchemy真正接管这个对象，确保可以commit
+    # 规避 session期或关闭导致的不能提交的问题
     db.add(user)
     await db.commit()
     await db.refresh(user)
-    return user
+    return True

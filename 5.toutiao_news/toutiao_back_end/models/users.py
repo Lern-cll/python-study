@@ -26,7 +26,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False, comment="用户名")
     password: Mapped[str] = mapped_column(String(255), nullable=False, comment="密码（加密存储）")
     nickname: Mapped[Optional[str]] = mapped_column(String(50), comment="昵称")
-    avatar: Mapped[Optional[str]] = mapped_column(String(255), comment="头像URL", default='https://c-ssl.dtstatic.com/uploads/blog/202010/06/20201006225133_11aa6.thumb.400_0.jpg')
+    avatar: Mapped[Optional[str]] = mapped_column(String(255), comment="头像URL", default='https://img10.qianzhan.com/star/%E9%AB%98%E5%9C%86%E5%9C%86/%E9%AB%98%E5%9C%86%E5%9C%86.jpg')
     gender: Mapped[Optional[str]] = mapped_column(
         Enum("male", "female", "unknown", name="gender_enum"),
         default="unknown",

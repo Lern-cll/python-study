@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from config.db_conf import get_db
-from crud.users import get_user_by_name, create_user, create_token, authenticate_user, update_user
+from crud.users import get_user_by_name, create_user, create_token, authenticate_user, update_user, update_user_password
 from models.users import User
 from schemas.users import UserRequest, UserAuthResponse, UserInfoResponse, UserUpdateRequest, UserChangePasswordRequest
 from utils.auth import get_current_user
@@ -96,10 +96,7 @@ async def change_password(
         db: AsyncSession = Depends(get_db)
 ):
     # 修改用户密码逻辑： 验证用户是否存在  -> 修改用户密码（用户输入数据-put提交-请求体参数-pydantic模型类） -> 返回响应结果
-    exit_user = await get_user_by_name(db, user.username)
-    if not exit_user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="用户不存在")
-    user = await update_user(db, user.username, password_data)
-    if not user:
+    result = await update_user_password(db, user, password_data)
+    if not result:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="修改用户密码失败")
     return success_response(message="修改用户密码成功")
