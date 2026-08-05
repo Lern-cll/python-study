@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from crud import  favorite
 from models.users import User
-from schemas.favorite import FavoriteCheckResponse, FavoriteAddResponse
+from schemas.favorite import FavoriteCheckResponse, FavoriteAddResponse, FavoriteListResponse
 from utils.auth import get_current_user
 from fastapi import Query, Body
 
@@ -53,3 +53,21 @@ async def remove_favorite(
     if not result:
         raise HTTPException(status_code=404, detail="收藏记录不存在")
     return success_response(message="删除收藏成功")
+
+
+@router.get('/list')
+async def get_favorite_list(
+        db: AsyncSession = Depends(get_db),
+        user: User = Depends(get_current_user),
+        page_size: int = Query(10, alias="pageSize", description="每页数量"),
+        page: int = Query(1, alias="page", description="页码"),
+):
+    rows, total = await favorite.get_favorite_list(db, user.id, page, page_size)
+    favorite_list = [{
+        **news.__dict__,
+        "favorite_time": favorite_time,
+        "favorite_id": favorite_id
+    } for news, favorite_time, favorite_id in rows]
+    has_more = total > page_size * page
+    data = FavoriteListResponse(list=favorite_list, total=total, hasMore=has_more)
+    return success_response(message="获取收藏列表成功", data=data)
