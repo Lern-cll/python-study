@@ -1,0 +1,46 @@
+{
+    "code": 200,
+    "message": "获取收藏列表成功",
+    "data": {
+        "list": [
+            {
+                "id": 1,
+                "title": "国家主席发表2024年新年贺词",
+                "description": "主席总结过去一年成就，展望未来发展蓝图，强调高质量发展。",
+                "image": "https://picsum.photos/id/100/200/200",
+                "author": "新华社",
+                "categoryId": 1,
+                "views": 12500,
+                "publishedTime": "2024-01-01T08:00:00",
+                "favoriteId": 5,
+                "favoriteTime": "2026-07-06T09:16:32"
+            },
+            {
+                "id": 1,
+                "title": "国家主席发表2024年新年贺词",
+                "description": "主席总结过去一年成就，展望未来发展蓝图，强调高质量发展。",
+                "image": "https://picsum.photos/id/100/200/200",
+                "author": "新华社",
+                "categoryId": 1,
+                "views": 12500,
+                "publishedTime": "2024-01-01T08:00:00",
+                "favoriteId": 3,
+                "favoriteTime": "2026-07-06T09:16:24"
+            },
+            {
+                "id": 1,
+                "title": "国家主席发表2024年新年贺词",
+                "description": "主席总结过去一年成就，展望未来发展蓝图，强调高质量发展。",
+                "image": "https://picsum.photos/id/100/200/200",
+                "author": "新华社",
+                "categoryId": 1,
+                "views": 12500,
+                "publishedTime": "2024-01-01T08:00:00",
+                "favoriteId": 1,
+                "favoriteTime": "2026-07-06T09:16:18"
+            }
+        ],
+        "total": 3,
+        "hasMore": false
+    }
+}

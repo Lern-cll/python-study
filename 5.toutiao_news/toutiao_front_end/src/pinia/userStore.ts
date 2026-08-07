@@ -115,10 +115,10 @@ export const useUserStore = defineStore('user', () => {
 
   /**
    * 更新用户信息（昵称、头像、简介等），成功后本地缓存同步覆盖
-   * @param data - 要更新的字段
+   * @param data - 要更新的字段（avatar 等字段若为 null 会被过滤掉，避免与后端类型冲突）
    * @returns 原始接口响应
    */
-  const updateUserInfo = async (data: Partial<UserInfo>) => {
+  const updateUserInfo = async (data: Parameters<typeof updateUserInfoApi>[0]) => {
     const res = await updateUserInfoApi(data)
     if (userInfo.value) {
       userInfo.value = { ...userInfo.value, ...data }

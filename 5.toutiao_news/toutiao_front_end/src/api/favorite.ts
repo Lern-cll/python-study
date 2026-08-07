@@ -53,11 +53,11 @@ export function removeFavorite(newsId: number): Promise<ApiResponse> {
 
 /**
  * 清空所有收藏
- * @returns 接口响应
+ * @returns 接口响应，data.count 表示本次清空的收藏条数
  */
-export function clearFavorites(): Promise<ApiResponse> {
+export function clearFavorites(): Promise<ApiResponse<{ count: number }>> {
   return request({
-    url: '/favorite/clear',
+    url: '/favorite/clear_all_favorite',
     method: 'delete'
   })
 }

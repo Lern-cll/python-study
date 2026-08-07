@@ -54,7 +54,7 @@ async def remove_favorite(
         raise HTTPException(status_code=404, detail="收藏记录不存在")
     return success_response(message="删除收藏成功")
 
-
+#  查询收藏列表
 @router.get('/list')
 async def get_favorite_list(
         db: AsyncSession = Depends(get_db),
@@ -63,6 +63,7 @@ async def get_favorite_list(
         page: int = Query(1, alias="page", description="页码"),
 ):
     rows, total = await favorite.get_favorite_list(db, user.id, page, page_size)
+    # [expression for item in iterable]
     favorite_list = [{
         **news.__dict__,
         "favorite_time": favorite_time,
@@ -71,3 +72,13 @@ async def get_favorite_list(
     has_more = total > page_size * page
     data = FavoriteListResponse(list=favorite_list, total=total, hasMore=has_more)
     return success_response(message="获取收藏列表成功", data=data)
+
+
+#  取消收藏列表
+@router.delete('/clear_all_favorite')
+async def clear_all_favorite(
+        db: AsyncSession = Depends(get_db),
+        user: User = Depends(get_current_user),
+):
+    count = await favorite.remove_all_favorite(db, user.id)
+    return success_response(message=f"清空了{count}条数据", data=count)
