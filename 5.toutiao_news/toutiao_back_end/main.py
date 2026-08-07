@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from routers import news, users, favorite
+from routers import news, users, favorite, history
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
@@ -18,6 +18,8 @@ async def root():
 app.include_router(news.router)
 app.include_router(users.router)
 app.include_router(favorite.router)
+app.include_router(history.router)
+
 
 # 添加cors中间件
 app.add_middleware(
