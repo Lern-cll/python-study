@@ -1,0 +1,43 @@
+{
+    "code": 200,
+    "message": "查询历史列表成功",
+    "data": {
+        "list": [
+            {
+                "id": 9,
+                "title": "2024年春运圆满结束",
+                "description": "全社会跨区域人员流动量预计累计超84亿人次，创历史新高。",
+                "image": "https://picsum.photos/id/108/200/200",
+                "author": "人民铁道报",
+                "publishTime": "2024-03-05T17:00:00",
+                "categoryId": 1,
+                "views": 7602,
+                "view_time": "2026-08-08T00:27:05"
+            },
+            {
+                "id": 3,
+                "title": "我国成功发射通信技术试验卫星十一号",
+                "description": "卫星顺利进入预定轨道，将用于开展多频段、高速率通信试验。",
+                "image": "https://picsum.photos/id/102/200/200",
+                "author": "央视新闻",
+                "publishTime": "2024-01-10T18:20:00",
+                "categoryId": 1,
+                "views": 11208,
+                "view_time": "2026-08-08T00:26:15"
+            },
+            {
+                "id": 1,
+                "title": "国家主席发表2024年新年贺词",
+                "description": "主席总结过去一年成就，展望未来发展蓝图，强调高质量发展。",
+                "image": "https://picsum.photos/id/100/200/200",
+                "author": "新华社",
+                "publishTime": "2024-01-01T08:00:00",
+                "categoryId": 1,
+                "views": 12523,
+                "view_time": "2026-08-08T00:17:40"
+            }
+        ],
+        "total": 3,
+        "hasMore": false
+    }
+}
