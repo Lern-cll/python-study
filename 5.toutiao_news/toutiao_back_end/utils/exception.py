@@ -1,9 +1,13 @@
+import logging
 import traceback
 
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from starlette import status
+
+# 业务 logger（命中白名单，可写入 success_log / error_log）
+logger = logging.getLogger("app.utils.exception")
 
 
 # 开发模式：返回详细错误信息
@@ -30,6 +34,9 @@ async def integrity_error_handler(request: Request, exc: IntegrityError):
     """
     处理 SQLAlchemy IntegrityError 异常（数据库完整性约束错误）
     """
+    logger.exception(
+        "[exception] IntegrityError at %s: %s", request.url.path, exc.orig
+    )
     error_msg = str(exc.orig)
     
     # 判断具体的约束错误类型
@@ -63,6 +70,9 @@ async def sqlalchemy_error_handler(request: Request, exc: SQLAlchemyError):
     """
     处理 SQLAlchemy 数据库错误
     """
+    logger.exception(
+        "[exception] SQLAlchemyError at %s: %s", request.url.path, exc
+    )
     # 开发模式下返回详细错误信息
     error_data = None
     if DEBUG_MODE:
@@ -88,6 +98,9 @@ async def general_exception_handler(request: Request, exc: Exception):
     """
     处理所有未捕获的异常
     """
+    logger.exception(
+        "[exception] Unhandled Exception at %s: %s", request.url.path, exc
+    )
     # 开发模式下返回详细错误信息
     error_data = None
     if DEBUG_MODE:

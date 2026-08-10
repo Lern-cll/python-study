@@ -239,7 +239,7 @@ const handleChangePassword = async () => {
 
 <style lang="scss" scoped>
 .user-info-page {
-  min-height: 100vh;
+  height: 100%;
   background: #f5f5f5;
 
   .header {

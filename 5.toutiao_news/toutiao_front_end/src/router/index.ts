@@ -58,26 +58,26 @@ const routes: RouteRecordRaw[] = [
         name: 'NewsDetail',
         component: NewsDetail,
         meta: { title: '新闻详情', hideTabBar: true }
+      },
+      {
+        path: '/user-info',
+        name: 'UserInfo',
+        component: UserInfo,
+        meta: { title: '个人信息', requiresAuth: true, hideTabBar: true }
+      },
+      {
+        path: '/favorites',
+        name: 'FavoriteList',
+        component: FavoriteList,
+        meta: { title: '我的收藏', requiresAuth: true, hideTabBar: true }
+      },
+      {
+        path: '/history',
+        name: 'HistoryList',
+        component: HistoryList,
+        meta: { title: '浏览历史', requiresAuth: true, hideTabBar: true }
       }
     ]
-  },
-  {
-    path: '/user-info',
-    name: 'UserInfo',
-    component: UserInfo,
-    meta: { title: '个人信息', requiresAuth: true }
-  },
-  {
-    path: '/favorites',
-    name: 'FavoriteList',
-    component: FavoriteList,
-    meta: { title: '我的收藏', requiresAuth: true }
-  },
-  {
-    path: '/history',
-    name: 'HistoryList',
-    component: HistoryList,
-    meta: { title: '浏览历史', requiresAuth: true }
   }
 ]
 

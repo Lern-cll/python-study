@@ -1,14 +1,17 @@
 <template>
   <div class="main-layout">
     <div class="main-content">
-      <!-- router-view + transition + keep-alive 组合：
-           transition 提供路由切换动画，keep-alive 缓存标记 keepAlive 的子路由 -->
+      <!-- router-view + keep-alive + key 组合：
+           - keep-alive 按路由 meta.keepAlive 缓存组件，保留滚动位置 / 表单状态等，
+             实现"用户访问哪里，再次进入还是在哪里"；
+           - :key="route.fullPath" 强制每次切换重建组件实例，
+             避免在某些边界条件下（如重复跳转同一 fullPath）路由切换后 router-view 空白；
+           - 注意：keep-alive 只缓存 include 命中的页面（当前只有 Home），
+             未命中的页面（如 NewsDetail）走 fallthrough 渲染、不缓存，行为不变。 -->
       <router-view v-slot="{ Component, route }">
-        <transition name="slide" mode="out-in">
-          <keep-alive :include="cachedViews">
-            <component :is="Component" :key="route.fullPath" />
-          </keep-alive>
-        </transition>
+        <keep-alive :include="cachedViews">
+          <component :is="Component" :key="route.fullPath" />
+        </keep-alive>
       </router-view>
     </div>
     <!-- 详情页等通过路由 meta.hideTabBar 隐藏底部 TabBar -->
@@ -114,18 +117,5 @@ const handleTabClick = (tab) => {
   }
 }
 
-.slide-enter-active,
-.slide-leave-active {
-  transition: transform 0.3s, opacity 0.3s;
-}
 
-.slide-enter-from {
-  transform: translateX(30px);
-  opacity: 0;
-}
-
-.slide-leave-to {
-  transform: translateX(-30px);
-  opacity: 0;
-}
 </style>

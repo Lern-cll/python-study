@@ -61,6 +61,15 @@
   </div>
 </template>
 
+<script>
+// 必须用普通 <script> 块显式声明组件名：<script setup> 默认不向组件选项暴露 name，
+// 而 MainLayout 里的 <keep-alive :include="cachedViews"> 是按"组件选项.name"匹配的。
+// 这里不写 name 会导致 Home 永远匹配不上 include、keep-alive 不生效，
+// 表现为"再次进入 Home 时滚动位置丢失 + onMounted 重复触发"。
+// 相比之下 defineOptions 在某些编译环境下也可能不生效，双 <script> 写法最稳。
+export default { name: 'Home' }
+</script>
+
 <script setup>
 import { ref, onMounted, onActivated, onDeactivated, computed, watch, nextTick } from 'vue'
 import { useNewsStore } from '@/pinia/newsStore'
