@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS `history` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='浏览历史表';
 
 -- 用户搜索历史表（账号绑定，跨设备同步）
-CREATE TABLE IF NOT EXISTS `user_search_history` (
+CREATE TABLE IF NOT EXISTS `news_app`.`user_search_history` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '历史ID',
   `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
   `keyword` VARCHAR(255) NOT NULL COMMENT '搜索关键词',
@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS `user_search_history` (
   INDEX `idx_user_time` (`user_id` ASC, `search_time` DESC),
   CONSTRAINT `fk_search_history_user`
     FOREIGN KEY (`user_id`)
-    REFERENCES `user` (`id`)
+    REFERENCES `news_app`.`user` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户搜索历史表';
