@@ -4,6 +4,7 @@ import Home from '@/pages/home/Home.vue'
 import AiChat from '@/pages/ai/AiChat.vue'
 import Mine from '@/pages/user/Mine.vue'
 import NewsDetail from '@/pages/news/NewsDetail.vue'
+import SearchResult from '@/pages/search/SearchResult.vue'
 import Login from '@/pages/auth/Login.vue'
 import Register from '@/pages/auth/Register.vue'
 import UserInfo from '@/pages/user/UserInfo.vue'
@@ -58,6 +59,12 @@ const routes: RouteRecordRaw[] = [
         name: 'NewsDetail',
         component: NewsDetail,
         meta: { title: '新闻详情', hideTabBar: true }
+      },
+      {
+        path: '/search',
+        name: 'SearchResult',
+        component: SearchResult,
+        meta: { title: '搜索', hideTabBar: true }
       },
       {
         path: '/user-info',

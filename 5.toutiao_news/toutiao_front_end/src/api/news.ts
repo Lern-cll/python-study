@@ -14,6 +14,16 @@ interface NewsListParams {
   categoryId?: number | null
 }
 
+/** 新闻搜索参数 */
+interface NewsSearchParams {
+  /** 搜索关键词（≥2 字符） */
+  keyword: string
+  /** 当前页码 */
+  page?: number
+  /** 每页条数 */
+  pageSize?: number
+}
+
 /**
  * 获取新闻分类列表（首页顶部 Tab 数据源）
  * @returns 分类列表的接口响应
@@ -48,5 +58,18 @@ export function getNewsDetail(id: number): Promise<ApiResponse<NewsItem>> {
     url: '/news/detail',
     method: 'get',
     params: { id }
+  })
+}
+
+/**
+ * 新闻搜索：跨 title/description/content/author 模糊匹配
+ * @param params - 搜索参数（keyword 必填，至少 2 个字符）
+ * @returns 搜索结果的接口响应
+ */
+export function searchNews(params: NewsSearchParams): Promise<ApiResponse<NewsItem[]>> {
+  return request({
+    url: '/news/search',
+    method: 'get',
+    params
   })
 }

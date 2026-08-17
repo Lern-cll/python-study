@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config.db_conf import AsyncSessionLocal
-from routers import news, users, favorite, history
+from routers import news, users, favorite, history, search_history
 from utils.exception_handlers import register_exception_handlers
 from utils.logging_conf import setup_logging
 from utils.scheduler import daily_task_runner
@@ -75,6 +75,7 @@ app.include_router(news.router)
 app.include_router(users.router)
 app.include_router(favorite.router)
 app.include_router(history.router)
+app.include_router(search_history.router)
 
 
 # 添加cors中间件

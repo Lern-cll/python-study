@@ -1,8 +1,13 @@
 <template>
   <div class="home-page">
-    <!-- 顶部 Logo -->
+    <!-- 顶部 Logo + 搜索入口 -->
     <div class="header">
       <h1 class="logo">头条</h1>
+      <!-- 搜索框：点击跳转到搜索页（输入关键词后回车在搜索页触发） -->
+      <div class="search-bar" @click="goSearch">
+        <el-icon class="search-icon"><Search /></el-icon>
+        <span class="search-placeholder">搜索新闻</span>
+      </div>
     </div>
     <!-- 分类导航 -->
     <CategoryNav
@@ -75,9 +80,16 @@ import { ref, onMounted, onActivated, onDeactivated, computed, watch, nextTick }
 import { useNewsStore } from '@/pinia/newsStore'
 import CategoryNav from '@/components/CategoryNav.vue'
 import NewsItem from '@/components/NewsItem.vue'
-import { Loading, ArrowDown } from '@element-plus/icons-vue'
+import { Loading, ArrowDown, Search } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 
 const newsStore = useNewsStore()
+const router = useRouter()
+
+// 跳转到搜索页（无关键词时直接进入，搜索页会展示热门/历史）
+const goSearch = () => {
+  router.push({ name: 'SearchResult' })
+}
 
 // 当前选中的分类 ID（与 CategoryNav v-model 双向绑定）
 const currentCategory = ref(null)
@@ -302,10 +314,37 @@ const handleCategoryChange = async (category) => {
     color: #fff;
     padding: 12px 15px;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 
     .logo {
       font-size: 1.25rem;
       font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    // 搜索入口（占满剩余空间，伪装成输入框）
+    .search-bar {
+      flex: 1;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 6px;
+      color: #999;
+      font-size: 0.875rem;
+      cursor: pointer;
+      // 轻微的按下反馈，提升点击感
+      &:active {
+        background: rgba(255, 255, 255, 0.78);
+      }
+
+      .search-icon {
+        font-size: 16px;
+      }
     }
   }
 

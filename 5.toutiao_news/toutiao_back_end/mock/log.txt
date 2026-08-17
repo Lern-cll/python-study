@@ -1,0 +1,36 @@
+216:51:31 [vite] Pre-transform error: [vue/compiler-sfc] Unexpected token, expected "from" (8:12)        
+
+D:/project_project_project/python-study/5.toutiao_news/toutiao_front_end/src/pages/search/SearchResult.vue
+100|  import { searchNews } from '@/api/news'
+101|  import { addSearchHistory, getSearchHistoryList, clearSearchHistory as clearSearchHistoryApi } from '@/api/searchHistory'
+102|  import type { SearchHistoryItem } from '@/api/searchHistory'
+   |              ^
+103|  import NewsItem from '@/components/NewsItem.vue'
+104|  import { useUserStore } from '@/pinia/userStore'
+16:51:32 [vite] Internal server error: [vue/compiler-sfc] Unexpected token, expected "from" (8:12)      
+
+D:/project_project_project/python-study/5.toutiao_news/toutiao_front_end/src/pages/search/SearchResult.vue
+100|  import { searchNews } from '@/api/news'
+101|  import { addSearchHistory, getSearchHistoryList, clearSearchHistory as clearSearchHistoryApi } from '@/api/searchHistory'
+102|  import type { SearchHistoryItem } from '@/api/searchHistory'
+   |              ^
+103|  import NewsItem from '@/components/NewsItem.vue'
+104|  import { useUserStore } from '@/pinia/userStore'
+  Plugin: vite:vue
+  File: D:/project_project_project/python-study/5.toutiao_news/toutiao_front_end/src/pages/search/SearchResult.vue:8:12
+  12 |          class="search-input"
+  13 |          @keyup.enter="handleSearch"
+  14 |          @clear="onInputClear"
+     |           ^
+  15 |        >
+  16 |          <template #prefix>
+      at constructor (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:365:19)
+      at Parser.raise (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:6616:19)
+      at Parser.unexpected (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:6636:16)
+      at Parser.expectContextual (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:6895:12)
+      at Parser.parseImportSpecifiersAndAfter (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:14260:10)
+      at Parser.parseImport (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:14252:17)
+      at Parser.parseStatementContent (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:12893:27)
+      at Parser.parseStatementLike (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:12784:17)
+      at Parser.parseModuleItem (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:12761:17)
+      at Parser.parseBlockOrModuleBlockBody (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:13333:36)

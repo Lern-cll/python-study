@@ -8,10 +8,11 @@ import router from '@/router'
  * - /news/categories 首页分类导航
  * - /news/list       首页新闻列表
  * - /news/detail     新闻详情
+ * - /news/search     新闻搜索（无需登录）
  * 注意：使用 includes 做模糊匹配，因 axios 内部已拼接 baseURL('/api')，
  * 所以 url 形如 '/api/news/list'，直接用 '/news/list' 即可匹配
  */
-const WHITELIST: string[] = ['/news/categories', '/news/list', '/news/detail']
+const WHITELIST: string[] = ['/news/categories', '/news/list', '/news/detail', '/news/search']
 
 // 创建 Axios 实例：统一 baseURL、超时、请求头
 const service: AxiosInstance = axios.create({

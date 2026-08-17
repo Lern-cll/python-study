@@ -583,3 +583,156 @@ DELETE /api/history/delete/1
   "data": null
 }
 ```
+
+### 新闻搜索模块
+
+#### 1. 新闻搜索
+
+- **接口地址**: `GET /api/news/search`
+- **请求参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| keyword | string | 是 | 搜索关键词，至少 2 个字符；后端会自动去除空格 |
+| page | integer | 否 | 页码，默认为1 |
+| pageSize | integer | 否 | 每页条数，默认为10，最大值为100 |
+
+- **请求示例**:
+
+```
+GET /api/news/search?keyword=人工智能
+GET /api/news/search?keyword=苹果&page=2&pageSize=20
+```
+
+- **搜索范围**：跨 `title`、`description`、`content`、`author` 四个字段做子串匹配（OR 关系，任一命中即返回）。
+- **排序规则**：
+  1. 字段命中优先级：`title` 命中 > `description` 命中 > `author` 命中 > `content` 命中
+  2. 同级别内按 `views` 倒序
+- **响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "list": [
+      {
+        "id": 1,
+        "title": "新闻标题",
+        "description": "新闻简介",
+        "content": "新闻内容",
+        "image": "https://example.com/cover.jpg",
+        "author": "来源",
+        "publishTime": "2023-01-01T00:00:00",
+        "categoryId": 1,
+        "views": 3850
+      }
+    ],
+    "total": 12,
+    "hasMore": false
+  }
+}
+```
+
+- **错误情况**:
+  - `keyword` 长度 < 2：FastAPI 自动返回 422 校验错误。
+  - 服务端异常：返回标准 500 响应。
+
+### 搜索历史模块
+
+> 所有接口均需在请求头携带 `Authorization: Bearer <token>`。每个用户的历史相互隔离，按 `search_time DESC` 返回最多 10 条。
+
+#### 1. 添加一条搜索历史
+
+- **接口地址**: `POST /api/search-history/add`
+- **请求参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| keyword | string | 是 | 搜索关键词，2 ~ 255 个字符 |
+
+- **请求示例**:
+
+```json
+{
+  "keyword": "人工智能"
+}
+```
+
+- **响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "记录搜索历史成功",
+  "data": {
+    "id": 12,
+    "keyword": "人工智能",
+    "searchTime": "2023-08-17T10:30:00"
+  }
+}
+```
+
+- **业务规则**:
+  - 同用户同关键词已存在：仅更新 `searchTime`（等价于"挪到最前"），不新增记录
+  - 同用户记录超过 10 条：自动删除最早的记录
+  - 未登录调用：返回 401
+
+#### 2. 获取当前用户的搜索历史
+
+- **接口地址**: `GET /api/search-history/list`
+- **请求参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| limit | integer | 否 | 返回条数，默认 10，最大 50 |
+
+- **请求示例**:
+
+```
+GET /api/search-history/list
+GET /api/search-history/list?limit=20
+```
+
+- **响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "获取搜索历史成功",
+  "data": {
+    "list": [
+      {
+        "id": 12,
+        "keyword": "人工智能",
+        "searchTime": "2023-08-17T10:30:00"
+      },
+      {
+        "id": 11,
+        "keyword": "苹果发布会",
+        "searchTime": "2023-08-17T09:10:00"
+      }
+    ],
+    "total": 2
+  }
+}
+```
+
+#### 3. 清空当前用户的所有搜索历史
+
+- **接口地址**: `DELETE /api/search-history/clear`
+- **请求示例**:
+
+```
+DELETE /api/search-history/clear
+```
+
+- **响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "成功删除2条搜索历史",
+  "data": null
+}
+```

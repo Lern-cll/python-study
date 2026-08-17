@@ -73,6 +73,43 @@ async def get_news_list(
     }
 
 
+# 新闻搜索：跨 title/description/content/author 模糊匹配
+# 排序：title 命中 > description 命中 > author 命中 > content 命中，同级别内 views DESC
+@router.get('/search')
+async def search_news(
+    db: AsyncSession = Depends(get_db),
+    # 搜索关键词：至少 2 个字符（去掉空格后的有效长度也由 crud 内做容错）
+    keyword: str = Query(..., min_length=2, alias="keyword"),
+    page: int = 1,
+    page_size: int = Query(10, le=100, alias="pageSize"),
+):
+    news_list = await news.search_news(db, keyword, page, page_size)
+    total_count = await news.search_news_total(db, keyword)
+    # 总量 > 跳过的 + 当前列表中的数量
+    has_more = total_count > len(news_list) + (page - 1) * page_size
+    return {
+        "code": 200,
+        "message": "success",
+        "data": {
+            "list": [
+                {
+                    "id": n.id,
+                    "title": n.title,
+                    "description": n.description,
+                    "content": n.content,
+                    "image": n.image,
+                    "author": n.author,
+                    "publishTime": n.publish_time,
+                    "categoryId": n.category_id,
+                    "views": n.views,
+                } for n in news_list
+            ],
+            "total": total_count,
+            "hasMore": has_more,
+        }
+    }
+
+
 # 获取新闻详情
 @router.get('/detail')
 async def get_news_detail(
