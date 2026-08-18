@@ -1,36 +1,59 @@
-216:51:31 [vite] Pre-transform error: [vue/compiler-sfc] Unexpected token, expected "from" (8:12)        
-
-D:/project_project_project/python-study/5.toutiao_news/toutiao_front_end/src/pages/search/SearchResult.vue
-100|  import { searchNews } from '@/api/news'
-101|  import { addSearchHistory, getSearchHistoryList, clearSearchHistory as clearSearchHistoryApi } from '@/api/searchHistory'
-102|  import type { SearchHistoryItem } from '@/api/searchHistory'
-   |              ^
-103|  import NewsItem from '@/components/NewsItem.vue'
-104|  import { useUserStore } from '@/pinia/userStore'
-16:51:32 [vite] Internal server error: [vue/compiler-sfc] Unexpected token, expected "from" (8:12)      
-
-D:/project_project_project/python-study/5.toutiao_news/toutiao_front_end/src/pages/search/SearchResult.vue
-100|  import { searchNews } from '@/api/news'
-101|  import { addSearchHistory, getSearchHistoryList, clearSearchHistory as clearSearchHistoryApi } from '@/api/searchHistory'
-102|  import type { SearchHistoryItem } from '@/api/searchHistory'
-   |              ^
-103|  import NewsItem from '@/components/NewsItem.vue'
-104|  import { useUserStore } from '@/pinia/userStore'
-  Plugin: vite:vue
-  File: D:/project_project_project/python-study/5.toutiao_news/toutiao_front_end/src/pages/search/SearchResult.vue:8:12
-  12 |          class="search-input"
-  13 |          @keyup.enter="handleSearch"
-  14 |          @clear="onInputClear"
-     |           ^
-  15 |        >
-  16 |          <template #prefix>
-      at constructor (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:365:19)
-      at Parser.raise (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:6616:19)
-      at Parser.unexpected (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:6636:16)
-      at Parser.expectContextual (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:6895:12)
-      at Parser.parseImportSpecifiersAndAfter (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:14260:10)
-      at Parser.parseImport (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:14252:17)
-      at Parser.parseStatementContent (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:12893:27)
-      at Parser.parseStatementLike (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:12784:17)
-      at Parser.parseModuleItem (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:12761:17)
-      at Parser.parseBlockOrModuleBlockBody (D:\project_project_project\python-study\5.toutiao_news\toutiao_front_end\node_modules\@babel\parser\lib\index.js:13333:36)
+2026-08-18 19:46:31,640 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-08-18 19:46:31,640 [INFO] sqlalchemy.engine.Engine: BEGIN (implicit)
+2026-08-18 19:46:31,641 INFO sqlalchemy.engine.Engine SELECT user_token.id, user_token.user_id, user_token.token, user_token.expires_at, user_token.created_at
+FROM user_token
+WHERE user_token.token = %s
+2026-08-18 19:46:31,641 [INFO] sqlalchemy.engine.Engine: SELECT user_token.id, user_token.user_id, user_token.token, user_token.expires_at, user_token.created_at
+FROM user_token
+WHERE user_token.token = %s
+2026-08-18 19:46:31,641 INFO sqlalchemy.engine.Engine [cached since 391.3s ago] ('bd763dea-863b-422e-b511-02cda2f246c8',)
+2026-08-18 19:46:31,641 [INFO] sqlalchemy.engine.Engine: [cached since 391.3s ago] ('bd763dea-863b-422e-b511-02cda2f246c8',)
+2026-08-18 19:46:31,644 INFO sqlalchemy.engine.Engine SELECT user.id, user.username, user.password, user.nickname, user.avatar, user.gender, user.bio, user.phone
+FROM user
+WHERE user.id = %s
+2026-08-18 19:46:31,644 [INFO] sqlalchemy.engine.Engine: SELECT user.id, user.username, user.password, user.nickname, user.avatar, user.gender, user.bio, user.phone
+FROM user
+WHERE user.id = %s
+2026-08-18 19:46:31,644 INFO sqlalchemy.engine.Engine [cached since 391.3s ago] (1,)
+2026-08-18 19:46:31,644 [INFO] sqlalchemy.engine.Engine: [cached since 391.3s ago] (1,)
+INFO:     127.0.0.1:51873 - "GET /api/user/info HTTP/1.1" 200 OK                                                                                                                                                                   
+2026-08-18 19:46:31,647 INFO sqlalchemy.engine.Engine COMMIT
+2026-08-18 19:46:31,647 [INFO] sqlalchemy.engine.Engine: COMMIT
+读取缓存失败：unknown command 'HELLO'
+2026-08-18 19:46:31,649 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-08-18 19:46:31,649 [INFO] sqlalchemy.engine.Engine: BEGIN (implicit)
+2026-08-18 19:46:31,649 INFO sqlalchemy.engine.Engine SELECT news_category.id, news_category.name, news_category.sort_order, news_category.created_at, news_category.updated_at
+FROM news_category ORDER BY news_category.sort_order
+ LIMIT %s, %s
+2026-08-18 19:46:31,649 [INFO] sqlalchemy.engine.Engine: SELECT news_category.id, news_category.name, news_category.sort_order, news_category.created_at, news_category.updated_at
+FROM news_category ORDER BY news_category.sort_order
+ LIMIT %s, %s
+2026-08-18 19:46:31,650 INFO sqlalchemy.engine.Engine [cached since 391.3s ago] (0, 10)
+2026-08-18 19:46:31,650 [INFO] sqlalchemy.engine.Engine: [cached since 391.3s ago] (0, 10)
+设置缓存失败：unknown command 'HELLO'
+INFO:     127.0.0.1:51874 - "GET /api/news/categories HTTP/1.1" 200 OK                                                                                                                                                             
+2026-08-18 19:46:31,657 INFO sqlalchemy.engine.Engine COMMIT
+2026-08-18 19:46:31,657 [INFO] sqlalchemy.engine.Engine: COMMIT
+2026-08-18 19:46:31,928 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-08-18 19:46:31,928 [INFO] sqlalchemy.engine.Engine: BEGIN (implicit)
+2026-08-18 19:46:31,928 INFO sqlalchemy.engine.Engine SELECT news.id, news.title, news.description, news.content, news.image, news.author, news.category_id, news.views, news.publish_time, news.created_at, news.updated_at       
+FROM news
+WHERE news.category_id = %s
+ LIMIT %s, %s
+2026-08-18 19:46:31,928 [INFO] sqlalchemy.engine.Engine: SELECT news.id, news.title, news.description, news.content, news.image, news.author, news.category_id, news.views, news.publish_time, news.created_at, news.updated_at    
+FROM news
+WHERE news.category_id = %s
+ LIMIT %s, %s
+2026-08-18 19:46:31,929 INFO sqlalchemy.engine.Engine [cached since 391.5s ago] (1, 0, 10)
+2026-08-18 19:46:31,929 [INFO] sqlalchemy.engine.Engine: [cached since 391.5s ago] (1, 0, 10)
+2026-08-18 19:46:31,931 INFO sqlalchemy.engine.Engine SELECT count(news.id) AS count_1
+FROM news
+WHERE news.category_id = %s
+2026-08-18 19:46:31,931 [INFO] sqlalchemy.engine.Engine: SELECT count(news.id) AS count_1
+FROM news
+WHERE news.category_id = %s
+2026-08-18 19:46:31,931 INFO sqlalchemy.engine.Engine [cached since 391.5s ago] (1,)
+2026-08-18 19:46:31,931 [INFO] sqlalchemy.engine.Engine: [cached since 391.5s ago] (1,)
+INFO:     127.0.0.1:51877 - "GET /api/news/list?page=1&pageSize=10&categoryId=1 HTTP/1.1" 200 OK                                                                                                                                   
+2026-08-18 19:46:31,934 INFO sqlalchemy.engine.Engine COMMIT
+2026-08-18 19:46:31,934 [INFO] sqlalchemy.engine.Engine: COMMIT
