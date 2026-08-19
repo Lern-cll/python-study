@@ -12,7 +12,8 @@ redis_client = redis.Redis(
     host=REDIS_HOST, # Redis 主机地址
     port=REDIS_PORT, # Redis 端口号
     db=REDIS_DB,     # Redis 数据库编号 0-15 默认的是 0，如果做数据隔离，可以用其他的
-    decode_responses=True # 是否将 Redis 中的数据自动解码为 字符串
+    decode_responses=True, # 是否将 Redis 中的数据自动解码为 字符串
+    protocol=2, # 兼容老版本 Redis（< 6.x 不支持 HELLO 命令，强制走 RESP2 协议）
 )
 
 
@@ -31,12 +32,6 @@ async def get_cache(key: str):
 
 # 读取：列表或者字典
 async def get_cache_list(key: str):
-    # try:
-    #     return await redis_client.lrange(key, 0, -1)
-    # except Exception as e:
-    #     # 处理异常，例如返回 None 或抛出异常
-    #     print(f"读取缓存失败：{e}")
-    #     return None
     try: 
         data =  await redis_client.get(key)
         if data :
