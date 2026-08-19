@@ -4,6 +4,7 @@ from config.db_conf import get_db
 from crud import news
 from typing import Optional
 from fastapi import Query
+from crud import news_cache
 
 # 创建 APIRouter 实例
 # prefix 前缀 (API 接口规范文档)
@@ -31,7 +32,7 @@ async def get_categories(
     # 先获取数据库里面新闻分类数据 -> 先定义模型类 -> 封装查询数据的方法
     # 调用 crud文件夹里面方法，返回结果
     # skip=(page - 1) * page_size, limit=page_size
-    categories = await news.get_categories(db, skip=(page - 1) * page_size, limit=page_size)
+    categories = await news_cache.get_categories(db, skip=(page - 1) * page_size, limit=page_size)
     # total = await news.get_total_categories(db)
     # total_page = total // page_size + (total % page_size > 0)
     return {
