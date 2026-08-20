@@ -59,7 +59,7 @@ async def get_news_list(
     page: int = 1,
     page_size: int = Query(10, le=100, alias="pageSize"),
 ):
-    news_list = await news.get_news_list(db, category_id, page, page_size)
+    news_list = await news_cache.get_news_list(db, category_id, page, page_size)
     total_count = await news.get_news_total(db, category_id)
     # 总量 > 跳过的 + 当前列表中的数量
     has_more = total_count > len(news_list) + page_size

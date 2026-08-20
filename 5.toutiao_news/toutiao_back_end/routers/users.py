@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from config.db_conf import get_db
-from crud.users import get_user_by_name, create_user, create_token, authenticate_user, update_user, update_user_password
+from crud.users_cache import get_user_by_name, create_user, create_token, authenticate_user, update_user, update_user_password
 from models.users import User
 from schemas.users import UserRequest, UserAuthResponse, UserInfoResponse, UserUpdateRequest, UserChangePasswordRequest
 from utils.auth import get_current_user

@@ -4,10 +4,6 @@ from sqlalchemy import select, func, update, or_
 
 # 获取新闻分类
 async def get_categories(db: AsyncSession, skip: int = 0, limit: int = 100):
-    # 从缓存中获取新闻分类
-    cached_categories = await get_cached_categories()
-    if cached_categories:
-        return cached_categories
     stmt = select(Category).order_by(Category.sort_order).offset(skip).limit(limit)
     result = await db.execute(stmt)
     return result.scalars().all()

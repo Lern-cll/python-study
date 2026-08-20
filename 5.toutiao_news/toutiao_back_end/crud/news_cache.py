@@ -2,7 +2,8 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from models.news import Category, News
 from sqlalchemy import select, func, update, or_
-from cache.news_cache import get_cached_categories, set_cached_categories
+from cache.news_cache import get_cached_categories, set_cached_categories, get_cached_news_list, set_cached_news_list
+from schemas.base import NewsItemBase
 
 
 
@@ -27,11 +28,29 @@ async def get_categories(db: AsyncSession, skip: int = 0, limit: int = 100):
 
 # 获取新闻列表
 async def get_news_list(db: AsyncSession, category_id: int, page: int, page_size: int):
+    # 从缓存中获取新闻列表
+    cached_news_list = await get_cached_news_list(category_id, page, page_size) # 缓存中的数据是 JSON 字符串
+    if cached_news_list:
+        # return cached_news_list  # 要的是ORM 对象，需要转换为 JSON 可序列化
+        return [News(**item) for item in cached_news_list]
+
     offset = (page - 1) * page_size
     limit = page_size
     stmt = select(News).where(News.category_id == category_id).offset(offset).limit(limit)
     result = await db.execute(stmt)
-    return result.scalars().all()
+    news_list = result.scalars().all()
+    
+    # 写入缓存
+    if news_list:
+        # 先把ORM 对象转换为 JSON 可序列化, 才能写入缓存
+        # news_list = jsonable_encoder(news_list)
+
+        # ORM 对象转为Pydantic 模型实例, 再转为字典
+        # by_alias  = False 不适用别名， 保存Python 风格， 因为Redis数据是给后端用的
+        news_data = [NewsItemBase.model_validate(item).model_dump(mode="json", by_alias=False) for item in news_list]
+        await set_cached_news_list(category_id, page, page_size, news_data)
+
+    return news_list
 
 # 获取新闻总数
 async def get_news_total(db: AsyncSession, category_id: int = None):
