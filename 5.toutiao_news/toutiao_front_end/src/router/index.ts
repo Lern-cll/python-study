@@ -46,7 +46,7 @@ const routes: RouteRecordRaw[] = [
         path: '/ai-chat',
         name: 'AiChat',
         component: AiChat,
-        meta: { title: 'AI问答' }
+        meta: { title: 'AI问答', requiresAuth: true }
       },
       {
         path: '/mine',

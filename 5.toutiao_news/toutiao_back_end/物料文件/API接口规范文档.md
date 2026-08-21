@@ -736,3 +736,205 @@ DELETE /api/search-history/clear
   "data": null
 }
 ```
+
+### AI 问答会话模块
+
+> 所有接口均需在请求头携带 `Authorization: Bearer <token>`。按当前用户隔离数据，`title` 由首条 user 消息自动截取 30 字符生成（创建时可省略，后端自动生成）。
+
+#### 1. 创建会话（首条 AI 回复成功后调用）
+
+- **接口地址**: `POST /api/ai-chat/sessions`
+- **请求头**: 需要认证
+- **请求参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| model | string | 是 | AI 模型标识，如 `qwen3-max` |
+| messages | array | 是 | 完整消息数组 `[{role, content}]`，不含 system，至少 1 条 |
+| title | string | 否 | 会话标题；省略时后端自动从首条 user 消息截取 30 字符 |
+
+- **请求示例**:
+
+```json
+{
+  "model": "qwen3-max",
+  "messages": [
+    { "role": "user", "content": "红烧肉的做法是什么" },
+    { "role": "assistant", "content": "红烧肉是一道经典的中式家常菜..." }
+  ],
+  "title": "红烧肉的做法是什么"
+}
+```
+
+- **响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "创建会话成功",
+  "data": {
+    "id": 1,
+    "title": "红烧肉的做法是什么",
+    "model": "qwen3-max",
+    "messages": [
+      { "role": "user", "content": "红烧肉的做法是什么" },
+      { "role": "assistant", "content": "红烧肉是一道经典的中式家常菜..." }
+    ],
+    "createdAt": "2026-08-21T17:00:00",
+    "updatedAt": "2026-08-21T17:00:00"
+  }
+}
+```
+
+#### 2. 更新会话（后续每轮 AI 回复成功后调用）
+
+- **接口地址**: `PUT /api/ai-chat/sessions/{session_id}`
+- **请求头**: 需要认证
+- **路径参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| session_id | integer | 是 | 会话 ID |
+
+- **请求参数**: 与"创建会话"一致，语义为"全量覆盖 messages"。
+- **响应示例**: 与"创建会话"一致；`updatedAt` 会自动刷新。
+
+#### 3. 获取会话列表（分页）
+
+- **接口地址**: `GET /api/ai-chat/sessions`
+- **请求头**: 需要认证
+- **请求参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| page | integer | 否 | 页码，默认为 1 |
+| pageSize | integer | 否 | 每页条数，默认为 10，最大 100 |
+
+- **请求示例**:
+
+```
+GET /api/ai-chat/sessions?page=1&pageSize=10
+```
+
+- **排序规则**: 按 `updatedAt DESC`（最近活跃的会话在最前）。
+- **响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "获取会话列表成功",
+  "data": {
+    "list": [
+      {
+        "id": 1,
+        "title": "红烧肉的做法是什么",
+        "model": "qwen3-max",
+        "updatedAt": "2026-08-21T17:00:00",
+        "messageCount": 4
+      }
+    ],
+    "total": 1,
+    "hasMore": false
+  }
+}
+```
+
+#### 4. 搜索会话（title + messages 内容命中，最多 5 条）
+
+- **接口地址**: `GET /api/ai-chat/sessions/search`
+- **请求头**: 需要认证
+- **请求参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| keyword | string | 是 | 搜索关键词，至少 1 个字符 |
+
+- **请求示例**:
+
+```
+GET /api/ai-chat/sessions/search?keyword=红烧肉
+```
+
+- **命中规则**: `title LIKE '%keyword%'` OR `messages` JSON 字段文本 LIKE 命中其一即可。
+- **结果上限**: 硬编码最多 5 条（`limit=5`）。
+- **响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "搜索会话成功",
+  "data": {
+    "list": [
+      {
+        "id": 1,
+        "title": "红烧肉的做法是什么",
+        "updatedAt": "2026-08-21T17:00:00"
+      }
+    ],
+    "total": 1
+  }
+}
+```
+
+#### 5. 获取会话详情（含完整 messages）
+
+- **接口地址**: `GET /api/ai-chat/sessions/{session_id}`
+- **请求头**: 需要认证
+- **路径参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| session_id | integer | 是 | 会话 ID |
+
+- **响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "获取会话详情成功",
+  "data": {
+    "id": 1,
+    "title": "红烧肉的做法是什么",
+    "model": "qwen3-max",
+    "messages": [
+      { "role": "user", "content": "红烧肉的做法是什么" },
+      { "role": "assistant", "content": "红烧肉是一道经典的中式家常菜..." }
+    ],
+    "createdAt": "2026-08-21T17:00:00",
+    "updatedAt": "2026-08-21T17:00:00"
+  }
+}
+```
+
+- **错误情况**:
+  - 会话不属于当前用户 → 返回 404。
+
+#### 6. 删除会话
+
+- **接口地址**: `DELETE /api/ai-chat/sessions/{session_id}`
+- **请求头**: 需要认证
+- **路径参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| session_id | integer | 是 | 会话 ID |
+
+- **请求示例**:
+
+```
+DELETE /api/ai-chat/sessions/1
+```
+
+- **响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "删除会话成功，共 1 条",
+  "data": null
+}
+```
+
+- **业务规则**:
+  - 硬删除，不进回收站
+  - 会话不属于当前用户 → 返回 404

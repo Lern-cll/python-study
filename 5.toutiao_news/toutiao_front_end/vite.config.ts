@@ -27,6 +27,12 @@ export default defineConfig({
       '/api': {
         target: 'http://127.0.0.1:10001',
         changeOrigin: true
+      },
+      // /qwen -> dashscope 千问兼容 OpenAI 协议入口（避免浏览器 CORS，仅 dev 生效）
+      '/qwen': {
+        target: 'https://dashscope.aliyuncs.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/qwen/, '')
       }
     }
   }

@@ -171,6 +171,25 @@ CREATE TABLE IF NOT EXISTS `ai_chat` (
     ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI聊天记录表';
 
+-- AI会话表（用户维度的对话会话，每个会话包含完整 messages JSON）
+CREATE TABLE IF NOT EXISTS `ai_chat_session` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '会话ID',
+  `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
+  `title` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '会话标题（首条用户消息截取30字）',
+  `model` VARCHAR(64) NOT NULL DEFAULT '' COMMENT 'AI模型标识，如 qwen3-max',
+  `messages` JSON NOT NULL COMMENT '完整消息数组 [{role, content}]，不含 system',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间（排序键）',
+  PRIMARY KEY (`id`),
+  INDEX `fk_ai_chat_session_user_idx` (`user_id` ASC),
+  INDEX `idx_user_updated` (`user_id` ASC, `updated_at` DESC),
+  CONSTRAINT `fk_ai_chat_session_user`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `user` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI会话表';
+
 -- 初始化数据
 -- 插入默认新闻分类
 INSERT INTO `news_category` (`name`, `sort_order`) VALUES 
