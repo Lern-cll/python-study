@@ -17,7 +17,7 @@ const WHITELIST: string[] = ['/news/categories', '/news/list', '/news/detail', '
 // 创建 Axios 实例：统一 baseURL、超时、请求头
 const service: AxiosInstance = axios.create({
   baseURL: '/api',
-  timeout: 10000,
+  timeout: 1000 * 180, // 180 秒超时
   headers: {
     'Content-Type': 'application/json'
   }

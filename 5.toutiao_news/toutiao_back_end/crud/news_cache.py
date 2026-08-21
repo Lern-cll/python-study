@@ -2,7 +2,10 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from models.news import Category, News
 from sqlalchemy import select, func, update, or_
-from cache.news_cache import get_cached_categories, set_cached_categories, get_cached_news_list, set_cached_news_list
+from cache.news_cache import (
+    get_cached_categories, set_cached_categories, get_cached_news_list,
+    set_cached_news_list, get_cached_news_detail, set_cached_news_detail,
+    set_cached_related_news, get_cached_related_news)
 from schemas.base import NewsItemBase
 
 
@@ -43,7 +46,12 @@ async def get_news_list(db: AsyncSession, category_id: int, page: int, page_size
     # 写入缓存
     if news_list:
         # 先把ORM 对象转换为 JSON 可序列化, 才能写入缓存
+
+        # jsonable_encoder 可以直接将pydamic对象转为 json格式的对象； 为数据库存储或json.dumps()准备数据
+        # 属于fastapi.encoders， 输入Pydantic模型、datetime对象等，输出Python对象（如dict）
         # news_list = jsonable_encoder(news_list)
+
+        #  序列化:json.dumps() \ 反序列化: json.load()    Python标准库 (json)
 
         # ORM 对象转为Pydantic 模型实例, 再转为字典
         # by_alias  = False 不适用别名， 保存Python 风格， 因为Redis数据是给后端用的
@@ -60,9 +68,20 @@ async def get_news_total(db: AsyncSession, category_id: int = None):
 
 # 获取新闻详情
 async def get_news_detail(db: AsyncSession, id: int):
+    # 从缓存中获取新闻详情
+    cached_news_detail = await get_cached_news_detail(id)
+    if cached_news_detail:
+        return News(**cached_news_detail)
+
     stmt = select(News).where(News.id == id)
     result = await db.execute(stmt)
-    return result.scalar_one_or_none() # 如果没有数据，返回 None
+    news_detail = result.scalar_one_or_none()  # Result 只能消费一次
+
+    # 写入缓存
+    if news_detail:
+        await set_cached_news_detail(id, jsonable_encoder(news_detail))
+
+    return news_detail  # 如果没有数据，返回 None
 
 # 更新新闻浏览量
 async def increase_news_views(db: AsyncSession, id: int):
@@ -136,10 +155,23 @@ async def get_related_news(
     category_id: int,
     limit: int = 5
 ):
+    # 从缓存中获取新闻详情
+    cached_related_news = await get_cached_related_news(category_id, news_id)
+    if cached_related_news:
+        return [News(**item) for item in cached_related_news]
+
+    # 从数据库中获取相关新闻
     stmt = select(News).where(News.category_id == category_id, News.id != news_id).order_by(News.views.desc(), News.publish_time.desc()).limit(limit)
     result = await db.execute(stmt)
     # return result.scalars().all()
     related_news = result.scalars().all()
+
+    # 写入缓存
+    if related_news:
+        await set_cached_related_news(category_id, news_id, jsonable_encoder(related_news))
+
+    # 转换为字典列表
+    # news_list = [dict(news) for news in related_news]
     return [
         {
             "id": news.id,

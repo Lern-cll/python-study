@@ -1,90 +1,10 @@
-(.venv) PS D:\project_project_project\python-study\5.toutiao_news\toutiao_back_end> py main.py
-INFO:     Will watch for changes in these directories: ['D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end']
-INFO:     Uvicorn running on http://127.0.0.1:10001 (Press CTRL+C to quit)
-INFO:     Started reloader process [32420] using StatReload
-INFO:     Started server process [35708]
-INFO:     Waiting for application startup.
-2026-08-19 17:15:06,689 INFO sqlalchemy.engine.Engine SELECT DATABASE()
-2026-08-19 17:15:06,689 [INFO] sqlalchemy.engine.Engine: SELECT DATABASE()
-2026-08-19 17:15:06,690 INFO sqlalchemy.engine.Engine [raw sql] ()
-2026-08-19 17:15:06,690 [INFO] sqlalchemy.engine.Engine: [raw sql] ()
-2026-08-19 17:15:06,691 INFO sqlalchemy.engine.Engine SELECT @@sql_mode
-2026-08-19 17:15:06,691 [INFO] sqlalchemy.engine.Engine: SELECT @@sql_mode
-2026-08-19 17:15:06,691 INFO sqlalchemy.engine.Engine [raw sql] ()
-2026-08-19 17:15:06,691 [INFO] sqlalchemy.engine.Engine: [raw sql] ()
-2026-08-19 17:15:06,692 INFO sqlalchemy.engine.Engine SELECT @@lower_case_table_names
-2026-08-19 17:15:06,692 [INFO] sqlalchemy.engine.Engine: SELECT @@lower_case_table_names
-2026-08-19 17:15:06,692 INFO sqlalchemy.engine.Engine [raw sql] ()
-2026-08-19 17:15:06,692 [INFO] sqlalchemy.engine.Engine: [raw sql] ()
-2026-08-19 17:15:06,693 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-08-19 17:15:06,693 [INFO] sqlalchemy.engine.Engine: BEGIN (implicit)
-2026-08-19 17:15:06,694 INFO sqlalchemy.engine.Engine DELETE FROM user_token WHERE user_token.expires_at < %s
-2026-08-19 17:15:06,694 [INFO] sqlalchemy.engine.Engine: DELETE FROM user_token WHERE user_token.expires_at < %s
-2026-08-19 17:15:06,694 INFO sqlalchemy.engine.Engine [generated in 0.00030s] (datetime.datetime(2026, 8, 19, 17, 15, 6, 671019),)
-2026-08-19 17:15:06,694 [INFO] sqlalchemy.engine.Engine: [generated in 0.00030s] (datetime.datetime(2026, 8, 19, 17, 15, 6, 671019),)
-2026-08-19 17:15:06,696 INFO sqlalchemy.engine.Engine COMMIT
-2026-08-19 17:15:06,696 [INFO] sqlalchemy.engine.Engine: COMMIT
-2026-08-19 17:15:06,697 [INFO] utils.scheduler: [scheduler] 后台调度任务启动，下次执行 00:00
-INFO:     Application startup complete.
-2026-08-19 17:15:24,725 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-08-19 17:15:24,725 [INFO] sqlalchemy.engine.Engine: BEGIN (implicit)
-2026-08-19 17:15:24,730 INFO sqlalchemy.engine.Engine SELECT user_token.id, user_token.user_id, user_token.token, user_token.expires_at, user_token.created_at 
-FROM user_token 
-WHERE user_token.token = %s
-2026-08-19 17:15:24,730 [INFO] sqlalchemy.engine.Engine: SELECT user_token.id, user_token.user_id, user_token.token, user_token.expires_at, user_token.created_at 
-FROM user_token 
-WHERE user_token.token = %s
-2026-08-19 17:15:24,737 INFO sqlalchemy.engine.Engine [generated in 0.00698s] ('bd763dea-863b-422e-b511-02cda2f246c8',)
-2026-08-19 17:15:24,737 [INFO] sqlalchemy.engine.Engine: [generated in 0.00698s] ('bd763dea-863b-422e-b511-02cda2f246c8',)
-2026-08-19 17:15:24,743 INFO sqlalchemy.engine.Engine SELECT user.id, user.username, user.password, user.nickname, user.avatar, user.gender, user.bio, user.phone 
-FROM user 
-WHERE user.id = %s
-2026-08-19 17:15:24,743 [INFO] sqlalchemy.engine.Engine: SELECT user.id, user.username, user.password, user.nickname, user.avatar, user.gender, user.bio, user.phone 
-FROM user
-WHERE user.id = %s
-2026-08-19 17:15:24,752 INFO sqlalchemy.engine.Engine [generated in 0.00899s] (1,)
-2026-08-19 17:15:24,752 [INFO] sqlalchemy.engine.Engine: [generated in 0.00899s] (1,)
-INFO:     127.0.0.1:64280 - "GET /api/user/info HTTP/1.1" 200 OK
-2026-08-19 17:15:24,777 INFO sqlalchemy.engine.Engine COMMIT
-2026-08-19 17:15:24,777 [INFO] sqlalchemy.engine.Engine: COMMIT
-2026-08-19 17:15:26,790 [INFO] cache_debug: [cache_debug] GET_LIST key=news:categories hit=False
-2026-08-19 17:15:26,791 [INFO] crud_debug: [crud_debug] get_categories cache MISS, query db skip=0 limit=10
-2026-08-19 17:15:26,791 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-08-19 17:15:26,791 [INFO] sqlalchemy.engine.Engine: BEGIN (implicit)
-2026-08-19 17:15:26,792 INFO sqlalchemy.engine.Engine SELECT news_category.id, news_category.name, news_category.sort_order, news_category.created_at, news_category.updated_at
-FROM news_category ORDER BY news_category.sort_order
- LIMIT %s, %s
-2026-08-19 17:15:26,792 [INFO] sqlalchemy.engine.Engine: SELECT news_category.id, news_category.name, news_category.sort_order, news_category.created_at, news_category.updated_at
-FROM news_category ORDER BY news_category.sort_order
- LIMIT %s, %s
-2026-08-19 17:15:26,792 INFO sqlalchemy.engine.Engine [generated in 0.00032s] (0, 10)
-2026-08-19 17:15:26,792 [INFO] sqlalchemy.engine.Engine: [generated in 0.00032s] (0, 10)
-2026-08-19 17:15:26,797 [INFO] crud_debug: [crud_debug] get_categories db rows=8
-2026-08-19 17:15:26,798 [INFO] cache_debug: [cache_debug] SETEX ok key=news:categories expire=3600s
-2026-08-19 17:15:26,798 [INFO] crud_debug: [crud_debug] get_categories write cache ok=True
-INFO:     127.0.0.1:64281 - "GET /api/news/categories HTTP/1.1" 200 OK                                                                                                                                                             
-2026-08-19 17:15:26,799 INFO sqlalchemy.engine.Engine COMMIT
-2026-08-19 17:15:26,799 [INFO] sqlalchemy.engine.Engine: COMMIT
-2026-08-19 17:15:26,812 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-08-19 17:15:26,812 [INFO] sqlalchemy.engine.Engine: BEGIN (implicit)
-2026-08-19 17:15:26,814 INFO sqlalchemy.engine.Engine SELECT news.id, news.title, news.description, news.content, news.image, news.author, news.category_id, news.views, news.publish_time, news.created_at, news.updated_at       
-FROM news
-WHERE news.category_id = %s
- LIMIT %s, %s
-2026-08-19 17:15:26,814 [INFO] sqlalchemy.engine.Engine: SELECT news.id, news.title, news.description, news.content, news.image, news.author, news.category_id, news.views, news.publish_time, news.created_at, news.updated_at    
-FROM news
-WHERE news.category_id = %s
- LIMIT %s, %s
-2026-08-19 17:15:26,814 INFO sqlalchemy.engine.Engine [generated in 0.00041s] (1, 0, 10)
-2026-08-19 17:15:26,814 [INFO] sqlalchemy.engine.Engine: [generated in 0.00041s] (1, 0, 10)
-2026-08-19 17:15:26,819 INFO sqlalchemy.engine.Engine SELECT count(news.id) AS count_1 
-FROM news
-WHERE news.category_id = %s
-2026-08-19 17:15:26,819 [INFO] sqlalchemy.engine.Engine: SELECT count(news.id) AS count_1
-FROM news
-WHERE news.category_id = %s
-2026-08-19 17:15:26,819 INFO sqlalchemy.engine.Engine [generated in 0.00045s] (1,)
-2026-08-19 17:15:26,819 [INFO] sqlalchemy.engine.Engine: [generated in 0.00045s] (1,)
-INFO:     127.0.0.1:64286 - "GET /api/news/list?page=1&pageSize=10&categoryId=1 HTTP/1.1" 200 OK                                                                                                                                   
-2026-08-19 17:15:26,821 INFO sqlalchemy.engine.Engine COMMIT
-2026-08-19 17:15:26,821 [INFO] sqlalchemy.engine.Engine: COMMIT
+{
+    "code": 500,
+    "message": "数据库操作失败，请稍后重试",
+    "data": {
+        "error_type": "ResourceClosedError",
+        "error_detail": "This result object is closed.",
+        "traceback": "Traceback (most recent call last):\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 42, in wrapped_app\n    await app(scope, receive, sender)\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 120, in app\n    response = await f(request)\n               ^^^^^^^^^^^^^^^^\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 674, in app\n    raw_response = await run_endpoint_function(\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<3 lines>...\n    )\n    ^\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 328, in run_endpoint_function\n    return await dependant.call(**values)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\routers\\news.py\", line 122, in get_news_detail\n    news_detail = await news_cache.get_news_detail(db, id)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\crud\\news_cache.py\", line 73, in get_news_detail\n    news_detail = result.scalar_one()\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\result.py\", line 1491, in scalar_one\n    return self._only_one_row(\n           ~~~~~~~~~~~~~~~~~~^\n        raise_for_second_row=True, raise_for_none=True, scalar=True\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\result.py\", line 769, in _only_one_row\n    row: Optional[_InterimRowType[Any]] = onerow(hard_close=True)\n                                          ~~~~~~^^^^^^^^^^^^^^^^^\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\result.py\", line 2297, in _fetchone_impl\n    self._raise_hard_closed()\n    ~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\result.py\", line 2283, in _raise_hard_closed\n    raise exc.ResourceClosedError(\"This result object is closed.\")\nsqlalchemy.exc.ResourceClosedError: This result object is closed.\n",
+        "path": "http://127.0.0.1:10001/api/news/detail?id=2"
+    }
+}

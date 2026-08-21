@@ -119,11 +119,11 @@ async def get_news_detail(
 ):
     # 获取新闻详情 + 浏览量+1  + 相关新闻
 
-    news_detail = await news.get_news_detail(db, id)
+    news_detail = await news_cache.get_news_detail(db, id)
     # 更新浏览量
     await news.increase_news_views(db, id)
     # 获取相关新闻
-    related_news = await news.get_related_news(db, id, news_detail.category_id)
+    related_news = await news_cache.get_related_news(db, id, news_detail.category_id)
  
     if not news_detail:
         raise HTTPException(status_code=404, detail="新闻不存在")
