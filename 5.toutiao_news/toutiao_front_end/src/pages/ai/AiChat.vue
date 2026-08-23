@@ -324,12 +324,18 @@ const handleDrawerScroll = async () => {
   }
 }
 
-// ============ 抽屉打开时拉取列表 ============
+// ============ 抽屉打开时拉取列表（每次打开都刷新一次）============
 watch(
   () => store.drawerOpen,
-  (open) => {
-    if (open && store.sessionList.length === 0 && !store.searchKeyword) {
-      store.fetchSessionList(true)
+  async (open) => {
+    if (!open) return                                    // 关闭：不动作
+    if (store.sessionListLoading) return                 // 已在拉：跳过，避免并发
+    if (store.searchKeyword) return                      // 搜索态：保留搜索结果，不刷新列表
+
+    await store.fetchSessionList(true)                   // 强制拉第 1 页全集
+    await nextTick()                                     // 等 DOM 落地
+    if (drawerScrollRef.value) {
+      drawerScrollRef.value.scrollTop = 0                // 刷新后回顶部
     }
   }
 )

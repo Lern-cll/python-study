@@ -1,10 +1,21 @@
-{
-    "code": 500,
-    "message": "数据库操作失败，请稍后重试",
-    "data": {
-        "error_type": "ResourceClosedError",
-        "error_detail": "This result object is closed.",
-        "traceback": "Traceback (most recent call last):\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 42, in wrapped_app\n    await app(scope, receive, sender)\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 120, in app\n    response = await f(request)\n               ^^^^^^^^^^^^^^^^\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 674, in app\n    raw_response = await run_endpoint_function(\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<3 lines>...\n    )\n    ^\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 328, in run_endpoint_function\n    return await dependant.call(**values)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\routers\\news.py\", line 122, in get_news_detail\n    news_detail = await news_cache.get_news_detail(db, id)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\crud\\news_cache.py\", line 73, in get_news_detail\n    news_detail = result.scalar_one()\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\result.py\", line 1491, in scalar_one\n    return self._only_one_row(\n           ~~~~~~~~~~~~~~~~~~^\n        raise_for_second_row=True, raise_for_none=True, scalar=True\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\result.py\", line 769, in _only_one_row\n    row: Optional[_InterimRowType[Any]] = onerow(hard_close=True)\n                                          ~~~~~~^^^^^^^^^^^^^^^^^\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\result.py\", line 2297, in _fetchone_impl\n    self._raise_hard_closed()\n    ~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"D:\\project_project_project\\python-study\\5.toutiao_news\\toutiao_back_end\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\result.py\", line 2283, in _raise_hard_closed\n    raise exc.ResourceClosedError(\"This result object is closed.\")\nsqlalchemy.exc.ResourceClosedError: This result object is closed.\n",
-        "path": "http://127.0.0.1:10001/api/news/detail?id=2"
-    }
-}
+-- auto-generated definition
+create table ai_chat
+(
+    id         int unsigned auto_increment comment '聊天记录ID'
+        primary key,
+    user_id    int unsigned                        not null comment '用户ID',
+    message    text                                not null comment '用户消息',
+    response   text                                not null comment 'AI回复',
+    created_at timestamp default CURRENT_TIMESTAMP not null comment '创建时间',
+    constraint fk_ai_chat_user
+        foreign key (user_id) references user (id)
+            on update cascade on delete cascade
+)
+    comment 'AI聊天记录表' charset = utf8mb4;
+
+create index fk_ai_chat_user_idx
+    on ai_chat (user_id);
+
+create index idx_created_at
+    on ai_chat (created_at desc);
+
