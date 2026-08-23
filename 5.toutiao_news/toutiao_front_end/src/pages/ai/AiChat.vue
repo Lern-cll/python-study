@@ -50,27 +50,31 @@
       </div>
     </div>
 
-    <!-- 输入区：多行输入 + 发送按钮 + 新建会话圆形 +按钮 -->
+    <!-- 输入区：单行输入 + 右侧 + 图标 + 80px 发送按钮 -->
     <div class="input-area">
       <el-input
         v-model="inputText"
-        type="textarea"
-        :rows="2"
-        placeholder="输入您的问题...（Enter 发送，Shift+Enter 换行）"
-        resize="none"
+        placeholder="请输入聊天内容"
         @keydown.enter.exact="handleEnterKey"
-      />
-      <el-button type="primary" :disabled="!inputText.trim() || store.isTyping" @click="handleSend">
-        发送
-      </el-button>
-      <el-button
-        circle
-        :disabled="store.isTyping"
-        class="new-chat-btn"
-        title="新会话"
-        @click="handleNewChat"
       >
-        <el-icon><Plus /></el-icon>
+        <template #suffix>
+          <div
+            class="chat-suffix"
+            :class="{ disabled: store.isTyping }"
+            title="新会话"
+            @click="handleNewChat"
+          >
+            <el-icon><Plus /></el-icon>
+          </div>
+        </template>
+      </el-input>
+      <el-button
+        type="primary"
+        class="send-btn"
+        :disabled="!inputText.trim() || store.isTyping"
+        @click="handleSend"
+      >
+        发送
       </el-button>
     </div>
 
@@ -554,7 +558,7 @@ watch(
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
     display: flex;
     gap: 10px;
-    align-items: flex-end;
+    align-items: center;            // 由 flex-end 改为 center，配合单行布局
 
     .el-input {
       flex: 1;
@@ -564,15 +568,31 @@ watch(
       flex-shrink: 0;
     }
 
-    .new-chat-btn {
-      background: #f5f5f5;
-      border-color: #e8e8e8;
-      color: #666;
+    .send-btn {
+      width: 80px;                  // 占右侧固定宽度，与输入框一起"占一整行"
+    }
 
-      &:hover:not(.is-disabled) {
-        background: #e63946;
-        color: #fff;
-        border-color: #e63946;
+    .chat-suffix {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      margin-right: 4px;            // 与输入框右边框稍留缝
+      color: #666;
+      cursor: pointer;
+      border-radius: 50%;
+      transition: background-color 0.2s, color 0.2s;
+
+      &:hover {
+        background: #f5f5f5;
+        color: #e63946;             // 复用原本 hover 红
+      }
+
+      &.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        pointer-events: none;
       }
     }
   }

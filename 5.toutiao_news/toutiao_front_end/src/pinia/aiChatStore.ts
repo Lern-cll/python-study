@@ -193,7 +193,7 @@ export const useAiChatStore = defineStore('aiChat', () => {
   const fetchSessionList = async (reset = false) => {
     if (reset) {
       sessionListPage.value = 1
-      sessionList.value = []
+      // 不再预先清空 sessionList：失败时保留旧列表，避免一次抖动就把内容刷没
     }
     sessionListLoading.value = true
     try {
