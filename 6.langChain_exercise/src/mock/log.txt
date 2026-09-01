@@ -1,0 +1,64 @@
+PS D:\project_project_project\python-study\6.langChain_exercise> uv run main.py
+D:\project_project_project\python-study\6.langChain_exercise\main.py:3: DeprecationWarning: `langchain-community` is being sunset and is no longer actively maintained. See https://github.com/langchain-ai/langchain-community/issues/674 for details and migration guidance toward standalone integration packages.
+  from langchain_community.chat_models.tongyi import ChatTongyi
+Traceback (most recent call last):
+  File "D:\project_project_project\python-study\6.langChain_exercise\main.py", line 25, in <module>                                                                                                                                 
+    print("config_chat_model", config_chat_model.invoke("你是谁？"))
+                               ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^                                                                                                                                                                 
+  File "D:\project_project_project\python-study\6.langChain_exercise\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 477, in invoke                                                                    
+    self.generate_prompt(
+    ~~~~~~~~~~~~~~~~~~~~^
+        [self._convert_input(input)],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    ).generations[0][0],
+    ^
+  File "D:\project_project_project\python-study\6.langChain_exercise\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1866, in generate_prompt                                                          
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project_project_project\python-study\6.langChain_exercise\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1673, in generate                                                                 
+    self._generate_with_cache(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        m,
+        ^^
+    ...<2 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "D:\project_project_project\python-study\6.langChain_exercise\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 2011, in _generate_with_cache                                                     
+    result = self._generate(
+        messages, stop=stop, run_manager=run_manager, **kwargs
+    )
+  File "D:\project_project_project\python-study\6.langChain_exercise\.venv\Lib\site-packages\langchain_anthropic\chat_models.py", line 2233, in _generate                                                                           
+    _handle_anthropic_api_error(e)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "D:\project_project_project\python-study\6.langChain_exercise\.venv\Lib\site-packages\langchain_anthropic\chat_models.py", line 2229, in _generate                                                                           
+    raw_response = self._create(payload)
+  File "D:\project_project_project\python-study\6.langChain_exercise\.venv\Lib\site-packages\langchain_anthropic\chat_models.py", line 1816, in _create                                                                             
+    return self._client.messages.with_raw_response.create(**payload)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "D:\project_project_project\python-study\6.langChain_exercise\.venv\Lib\site-packages\anthropic\_response.py", line 796, in wrapped                                                                                          
+    return cast(APIResponse[R], func(*args, **kwargs))
+                                ~~~~^^^^^^^^^^^^^^^^^
+  File "D:\project_project_project\python-study\6.langChain_exercise\.venv\Lib\site-packages\anthropic\_utils\_utils.py", line 294, in wrapper                                                                                      
+    return func(*args, **kwargs)
+  File "D:\project_project_project\python-study\6.langChain_exercise\.venv\Lib\site-packages\anthropic\resources\messages\messages.py", line 968, in create                                                                         
+    return self._post(
+           ~~~~~~~~~~^
+        "/v1/messages",
+        ^^^^^^^^^^^^^^^
+    ...<27 lines>...
+        stream_cls=Stream[RawMessageStreamEvent],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\project_project_project\python-study\6.langChain_exercise\.venv\Lib\site-packages\anthropic\_base_client.py", line 1490, in post                                                                                         
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project_project_project\python-study\6.langChain_exercise\.venv\Lib\site-packages\anthropic\_base_client.py", line 1174, in request                                                                                      
+    raise self._make_status_error_from_response(response) from None
+anthropic.APIStatusError: Error code: 402 - {'type': 'error', 'error': {'type': 'insufficient_balance_error', 'message': 'insufficient balance (1008)'}, 'request_id': '06e5ce1eddee8d3c03bb6ea3850fbe8b'}                          
+PS D:\project_project_project\python-study\6.langChain_exercise> 
