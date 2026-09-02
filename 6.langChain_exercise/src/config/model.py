@@ -19,7 +19,7 @@ def _require_env(name: str) -> str:
     return value
 
 
-MINIMAX_MODEL_NAME = os.environ.get("MINIMAX_MODEL_NAME", "MiniMaxi-M2.7")
+MINIMAX_MODEL_NAME = os.environ.get("MINIMAX_MODEL_NAME", "MiniMaxi-M3")
 MINIMAX_API_URL = os.environ.get("MINIMAX_API_URL", "https://api.minimaxi.com/anthropic")
 MINIMAX_API_KEY = _require_env("MINIMAX_API_KEY")
 
