@@ -1,6 +1,6 @@
 from src.config.model import config_chat_model
 from src.mock.test import test_get_weather, image_ask, web_search
-
+from src.mock.test_memory import test_memory1, test_memory2
 # 这是一个示例 Python 脚本。
 
 # 按 Shift+F10 执行或将其替换为您的代码。
@@ -17,8 +17,14 @@ if __name__ == '__main__':
     # 测试图片问题
     # image_ask()
 
+    # 测试记忆
+    test_memory1()
+
+    # 测试记忆2
+    test_memory2()
+
     # 测试网络搜索
-    web_search()
+    # web_search()
 
 
 
